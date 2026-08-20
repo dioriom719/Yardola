@@ -25,13 +25,15 @@ export async function listOwnedBusinesses(): Promise<OwnedBusiness[]> {
 
   const { data, error } = await supabase
     .from("businesses")
-    .select(`
+    .select(
+      `
       id, name, slug, description, website, phone, email, logo_url,
       city, state, status, verification_status,
       business_services(count),
       business_service_areas(count),
       leads(count)
-    `)
+    `
+    )
     .eq("owner_id", userData.user.id)
     .order("created_at", { ascending: false });
 
@@ -56,16 +58,28 @@ export async function listOwnedBusinesses(): Promise<OwnedBusiness[]> {
   }));
 }
 
-export async function listMyBusinessClaims() {
+export interface MyBusinessClaim {
+  id: string;
+  business_id: string;
+  status: string;
+  verification_info: unknown;
+  created_at: string;
+  businesses: { name: string; slug: string } | null;
+}
+
+export async function listMyBusinessClaims(): Promise<MyBusinessClaim[]> {
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return [];
 
   const { data, error } = await supabase
     .from("business_claims")
-    .select("id, business_id, status, verification_info, created_at, businesses(name, slug)")
+    .select(
+      "id, business_id, status, verification_info, created_at, businesses(name, slug)"
+    )
     .eq("claimant_id", userData.user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .returns<MyBusinessClaim[]>();
 
   if (error) throw error;
   return data ?? [];

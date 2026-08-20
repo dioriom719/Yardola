@@ -37,7 +37,9 @@ export async function submitProjectPlan(planId: string) {
   };
 }
 
-export async function getLeadForPlan(planId: string): Promise<LeadSummary | null> {
+export async function getLeadForPlan(
+  planId: string
+): Promise<LeadSummary | null> {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
 
@@ -53,18 +55,27 @@ export async function getLeadForPlan(planId: string): Promise<LeadSummary | null
   if (leadError) throw leadError;
   if (!lead) return null;
 
+  interface LeadMatchRow {
+    id: string;
+    business_id: string;
+    match_score: number | null;
+    match_status: LeadMatchSummary["status"];
+    businesses: { name: string; slug: string; city: string | null } | null;
+  }
+
   const { data: matches, error: matchError } = await supabase
     .from("lead_matches")
-    .select("id, business_id, match_score, match_status, businesses(name, slug, city)")
+    .select(
+      "id, business_id, match_score, match_status, businesses(name, slug, city)"
+    )
     .eq("lead_id", lead.id)
-    .order("match_score", { ascending: false });
+    .order("match_score", { ascending: false })
+    .returns<LeadMatchRow[]>();
 
   if (matchError) throw matchError;
 
   const mapped: LeadMatchSummary[] = (matches ?? []).flatMap((match) => {
-    const business = match.businesses as
-      | { name: string; slug: string; city: string | null }
-      | null;
+    const business = match.businesses;
     if (!business) return [];
     return [
       {

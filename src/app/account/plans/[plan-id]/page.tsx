@@ -7,8 +7,16 @@ import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { ProjectCard } from "@/components/yardola/project-card";
 import { PlanActionsMenu } from "@/app/account/plans/plan-actions-menu";
 import { SubmitPlanButton } from "@/app/account/plans/submit-plan-button";
-import { RemovePhotoButton, RemoveInspirationButton } from "./plan-detail-actions";
-import { formatBudgetRange, formatDate, formatPlanTitle, formatTimeline } from "@/lib/format";
+import {
+  RemovePhotoButton,
+  RemoveInspirationButton,
+} from "./plan-detail-actions";
+import {
+  formatBudgetRange,
+  formatDate,
+  formatPlanTitle,
+  formatTimeline,
+} from "@/lib/format";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getPlanDetail } from "@/lib/data/plans";
 import { getLeadForPlan } from "@/lib/data/leads";
@@ -20,7 +28,9 @@ export const metadata = buildMetadata({
   index: false,
 });
 
-export default async function PlanDetailPage(props: PageProps<"/account/plans/[plan-id]">) {
+export default async function PlanDetailPage(
+  props: PageProps<"/account/plans/[plan-id]">
+) {
   const params = await props.params;
   const plan = await getPlanDetail(params["plan-id"]);
   if (!plan) notFound();
@@ -31,46 +41,108 @@ export default async function PlanDetailPage(props: PageProps<"/account/plans/[p
 
   const details: { label: string; value: string }[] = [
     { label: "Project", value: categoryNames.join(" + ") || "Not set" },
-    { label: "Location", value: plan.city ? `${plan.city.name}, ${plan.city.stateAbbreviation}${plan.zipCode ? ` ${plan.zipCode}` : ""}` : "Not set" },
-    { label: "Style", value: plan.styles.map((s) => s.name).join(", ") || "Not specified" },
-    { label: "Budget", value: formatBudgetRange(plan.budgetRange) ?? "Not specified" },
-    { label: "Timeline", value: formatTimeline(plan.timeline) ?? "Not specified" },
+    {
+      label: "Location",
+      value: plan.city
+        ? `${plan.city.name}, ${plan.city.stateAbbreviation}${plan.zipCode ? ` ${plan.zipCode}` : ""}`
+        : "Not set",
+    },
+    {
+      label: "Style",
+      value: plan.styles.map((s) => s.name).join(", ") || "Not specified",
+    },
+    {
+      label: "Budget",
+      value: formatBudgetRange(plan.budgetRange) ?? "Not specified",
+    },
+    {
+      label: "Timeline",
+      value: formatTimeline(plan.timeline) ?? "Not specified",
+    },
   ];
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-      <SeoBreadcrumbs items={[{ label: "Home", href: "/" }, { label: "My Yardola", href: "/account" }, { label: "My Plans", href: "/account/plans" }, { label: displayTitle }]} />
+      <SeoBreadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "My Yardola", href: "/account" },
+          { label: "My Plans", href: "/account/plans" },
+          { label: displayTitle },
+        ]}
+      />
 
       <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
         <div>
-          {plan.status === "closed" && <Badge variant="secondary" className="mb-2">Archived</Badge>}
-          <h1 className="font-display text-foreground text-3xl sm:text-4xl">{displayTitle}</h1>
-          <p className="text-muted-foreground mt-2 text-sm">Last updated {formatDate(plan.updatedAt)}</p>
+          {plan.status === "closed" && (
+            <Badge variant="secondary" className="mb-2">
+              Archived
+            </Badge>
+          )}
+          <h1 className="font-display text-foreground text-3xl sm:text-4xl">
+            {displayTitle}
+          </h1>
+          <p className="text-muted-foreground mt-2 text-sm">
+            Last updated {formatDate(plan.updatedAt)}
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" nativeButton={false} render={<Link href={`/plan?planId=${plan.id}&step=9`} />}>Edit Plan</Button>
-          <PlanActionsMenu planId={plan.id} isArchived={plan.status === "closed"} redirectAfterDelete="/account/plans" />
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={<Link href={`/plan?planId=${plan.id}&step=9`} />}
+          >
+            Edit Plan
+          </Button>
+          <PlanActionsMenu
+            planId={plan.id}
+            isArchived={plan.status === "closed"}
+            redirectAfterDelete="/account/plans"
+          />
         </div>
       </div>
 
       <dl className="divide-border border-border mt-8 divide-y rounded-lg border px-5">
         {details.map((detail) => (
-          <div key={detail.label} className="flex justify-between gap-4 py-3.5 text-sm">
+          <div
+            key={detail.label}
+            className="flex justify-between gap-4 py-3.5 text-sm"
+          >
             <dt className="text-muted-foreground">{detail.label}</dt>
-            <dd className="text-foreground text-right font-medium">{detail.value}</dd>
+            <dd className="text-foreground text-right font-medium">
+              {detail.value}
+            </dd>
           </div>
         ))}
       </dl>
 
-      {plan.description && <section className="mt-8"><h2 className="font-display text-foreground text-lg">Description</h2><p className="text-muted-foreground mt-2 text-sm whitespace-pre-line">{plan.description}</p></section>}
+      {plan.description && (
+        <section className="mt-8">
+          <h2 className="font-display text-foreground text-lg">Description</h2>
+          <p className="text-muted-foreground mt-2 text-sm whitespace-pre-line">
+            {plan.description}
+          </p>
+        </section>
+      )}
 
       {plan.photos.length > 0 && (
         <section className="mt-8">
-          <h2 className="font-display text-foreground text-lg">Your backyard today</h2>
+          <h2 className="font-display text-foreground text-lg">
+            Your backyard today
+          </h2>
           <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
             {plan.photos.map((photo) => (
-              <div key={photo.id} className="bg-muted relative aspect-square overflow-hidden rounded-lg">
-                <Image src={photo.url} alt="Your backyard" fill sizes="200px" className="object-cover" />
+              <div
+                key={photo.id}
+                className="bg-muted relative aspect-square overflow-hidden rounded-lg"
+              >
+                <Image
+                  src={photo.url}
+                  alt="Your backyard"
+                  fill
+                  sizes="200px"
+                  className="object-cover"
+                />
                 <RemovePhotoButton planId={plan.id} photoId={photo.id} />
               </div>
             ))}
@@ -80,10 +152,18 @@ export default async function PlanDetailPage(props: PageProps<"/account/plans/[p
 
       {plan.inspiration.length > 0 && (
         <section className="mt-8">
-          <h2 className="font-display text-foreground text-lg">Inspiration ({plan.inspiration.length})</h2>
+          <h2 className="font-display text-foreground text-lg">
+            Inspiration ({plan.inspiration.length})
+          </h2>
           <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3">
             {plan.inspiration.map((project) => (
-              <div key={project.id} className="relative"><ProjectCard project={project} initialSaved /><RemoveInspirationButton planId={plan.id} projectId={project.id} /></div>
+              <div key={project.id} className="relative">
+                <ProjectCard project={project} initialSaved />
+                <RemoveInspirationButton
+                  planId={plan.id}
+                  projectId={project.id}
+                />
+              </div>
             ))}
           </div>
         </section>
@@ -94,28 +174,69 @@ export default async function PlanDetailPage(props: PageProps<"/account/plans/[p
           <>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="font-display text-foreground text-xl">Your professional matches</h2>
-                <p className="text-muted-foreground mt-1 text-sm">We matched your project with {lead.matches.length} active Yardola professionals.</p>
+                <h2 className="font-display text-foreground text-xl">
+                  Your professional matches
+                </h2>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  We matched your project with {lead.matches.length} active
+                  Yardola professionals.
+                </p>
               </div>
-              <Badge>{lead.status === "matched" ? "Matched" : lead.status}</Badge>
+              <Badge>
+                {lead.status === "matched" ? "Matched" : lead.status}
+              </Badge>
             </div>
             <div className="mt-5 space-y-3">
               {lead.matches.map((match) => (
-                <div key={match.id} className="bg-background border-border flex items-center justify-between gap-4 rounded-lg border p-4">
+                <div
+                  key={match.id}
+                  className="bg-background border-border flex items-center justify-between gap-4 rounded-lg border p-4"
+                >
                   <div>
-                    <Link href={`/professionals/${match.businessSlug}`} className="font-medium hover:underline">{match.businessName}</Link>
-                    {match.city && <p className="text-muted-foreground mt-1 text-xs">{match.city}</p>}
+                    <Link
+                      href={`/professionals/${match.businessSlug}`}
+                      className="font-medium hover:underline"
+                    >
+                      {match.businessName}
+                    </Link>
+                    {match.city && (
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        {match.city}
+                      </p>
+                    )}
                   </div>
-                  <div className="text-right"><p className="text-sm font-medium">{Math.round(match.matchScore)}% match</p><Button size="sm" variant="outline" nativeButton={false} render={<Link href={`/professionals/${match.businessSlug}`} />}>View</Button></div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">
+                      {Math.round(match.matchScore)}% match
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      nativeButton={false}
+                      render={
+                        <Link href={`/professionals/${match.businessSlug}`} />
+                      }
+                    >
+                      View
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
           </>
         ) : (
           <div className="text-center">
-            <h2 className="font-display text-foreground text-xl">Ready to find a professional?</h2>
-            <p className="text-muted-foreground mx-auto mt-2 max-w-xl text-sm">Yardola will compare your project type and location with active professionals who offer the right services, then send your project to the best matches.</p>
-            <div className="mt-5"><SubmitPlanButton planId={plan.id} /></div>
+            <h2 className="font-display text-foreground text-xl">
+              Ready to find a professional?
+            </h2>
+            <p className="text-muted-foreground mx-auto mt-2 max-w-xl text-sm">
+              Yardola will compare your project type and location with active
+              professionals who offer the right services, then send your project
+              to the best matches.
+            </p>
+            <div className="mt-5">
+              <SubmitPlanButton planId={plan.id} />
+            </div>
           </div>
         )}
       </section>
