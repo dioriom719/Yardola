@@ -114,6 +114,13 @@ export default async function BusinessDashboardPage() {
                   >
                     View leads
                   </Button>
+                  <Button
+                    variant="outline"
+                    nativeButton={false}
+                    render={<Link href={`/business/billing/${business.id}`} />}
+                  >
+                    Billing
+                  </Button>
                   {business.status === "active" && (
                     <Button
                       variant="ghost"

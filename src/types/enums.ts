@@ -28,3 +28,16 @@ export type ProjectTimeline =
   "planning_only" | "asap" | "1_3_months" | "3_6_months" | "6_12_months";
 
 export type ProjectPlanStatus = "draft" | "submitted" | "matched" | "closed";
+
+export type BillingInterval = "month" | "year" | "one_time";
+
+export type SubscriptionStatus =
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled"
+  | "expired"
+  | "incomplete"
+  | "incomplete_expired";
+
+export type TransactionStatus = "pending" | "succeeded" | "failed" | "refunded";

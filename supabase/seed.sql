@@ -421,9 +421,15 @@ join public.categories c on c.slug = v.category_slug;
 -- ----------------------------------------------------------------------------
 -- Monetization catalog (plans only -- no subscriptions/transactions without
 -- real businesses/billing wired up).
+--
+-- stripe_product_id / stripe_price_id are intentionally left null here:
+-- this is dev seed data and no real Stripe catalog exists for it. Populate
+-- them (via the Supabase dashboard/SQL, not by editing this file with real
+-- values) once real Stripe test/live Products & Prices exist. A plan with
+-- a null stripe_price_id can be listed but not checked out.
 -- ----------------------------------------------------------------------------
 
-insert into public.plans (name, slug, description, price_cents, billing_interval, features, sort_order) values
-  ('Basic', 'basic', 'Free listing with a standard business profile.', 0, 'month', '["business_profile", "up_to_5_projects"]'::jsonb, 1),
-  ('Featured', 'featured', 'Priority placement in category and location browse pages.', 9900, 'month', '["business_profile", "unlimited_projects", "featured_placement"]'::jsonb, 2),
-  ('Premium', 'premium', 'Featured placement plus priority lead matching.', 24900, 'month', '["business_profile", "unlimited_projects", "featured_placement", "priority_lead_matching"]'::jsonb, 3);
+insert into public.plans (name, slug, description, price_cents, billing_interval, features, max_active_leads, sort_order) values
+  ('Basic', 'basic', 'Free listing with a standard business profile.', 0, 'month', '["business_profile", "up_to_5_projects"]'::jsonb, 5, 1),
+  ('Featured', 'featured', 'Priority placement in category and location browse pages.', 9900, 'month', '["business_profile", "unlimited_projects", "featured_placement"]'::jsonb, null, 2),
+  ('Premium', 'premium', 'Featured placement plus priority lead matching.', 24900, 'month', '["business_profile", "unlimited_projects", "featured_placement", "priority_lead_matching"]'::jsonb, null, 3);

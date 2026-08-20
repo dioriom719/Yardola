@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireUserId } from "@/lib/supabase/auth";
+import { getLeadEntitlement } from "@/lib/data/billing";
 
 export interface BusinessLead {
   matchId: string;
@@ -77,7 +78,7 @@ export async function listBusinessLeads(): Promise<BusinessLead[]> {
 
   if (error) throw error;
 
-  return (data ?? []).flatMap((row) => {
+  const allLeads: BusinessLead[] = (data ?? []).flatMap((row) => {
     const lead = row.leads;
     if (!lead?.project_plans) return [];
     const plan = lead.project_plans;
@@ -106,5 +107,29 @@ export async function listBusinessLeads(): Promise<BusinessLead[]> {
         },
       },
     ];
+  });
+
+  // Entitlement enforcement (Phase 9): cap how many active leads are
+  // *returned* per business according to its plan, without touching the
+  // underlying lead_matches rows -- an upgrade immediately surfaces the
+  // rest. Ordered newest-first above, so the cap keeps the most recent
+  // leads. A business with no subscription falls back to the Basic plan's
+  // limit (see getLeadEntitlement), so pre-Phase-9 dev/test data keeps
+  // working rather than being blocked outright.
+  const entitlementByBusiness = new Map(
+    await Promise.all(
+      businessIds.map(
+        async (id) => [id, await getLeadEntitlement(supabase, id)] as const
+      )
+    )
+  );
+  const seenPerBusiness = new Map<string, number>();
+  return allLeads.filter((lead) => {
+    const cap = entitlementByBusiness.get(lead.businessId)?.maxActiveLeads;
+    if (cap == null) return true;
+    const seen = seenPerBusiness.get(lead.businessId) ?? 0;
+    if (seen >= cap) return false;
+    seenPerBusiness.set(lead.businessId, seen + 1);
+    return true;
   });
 }

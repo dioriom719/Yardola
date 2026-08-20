@@ -1,7 +1,9 @@
 import type {
+  BillingInterval,
   BudgetRange,
   ProjectTimeline,
   PropertyType,
+  SubscriptionStatus,
   VerificationStatus,
 } from "@/types/enums";
 
@@ -65,6 +67,42 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
 
 export function formatDate(value: string | null | undefined) {
   return value ? DATE_FORMATTER.format(new Date(value)) : null;
+}
+
+const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
+
+export function formatPriceCents(cents: number): string {
+  if (cents === 0) return "Free";
+  return CURRENCY_FORMATTER.format(cents / 100);
+}
+
+const BILLING_INTERVAL_LABELS: Record<BillingInterval, string> = {
+  month: "/month",
+  year: "/year",
+  one_time: " one-time",
+};
+
+export function formatBillingInterval(value: BillingInterval): string {
+  return BILLING_INTERVAL_LABELS[value];
+}
+
+const SUBSCRIPTION_STATUS_LABELS: Record<SubscriptionStatus, string> = {
+  trialing: "Trialing",
+  active: "Active",
+  past_due: "Payment past due",
+  canceled: "Canceled",
+  expired: "Expired",
+  incomplete: "Payment required",
+  incomplete_expired: "Payment window expired",
+};
+
+export function formatSubscriptionStatus(value: SubscriptionStatus): string {
+  return SUBSCRIPTION_STATUS_LABELS[value];
 }
 
 /** A plan without a homeowner-chosen name falls back to its first project type. */

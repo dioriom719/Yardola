@@ -12,3 +12,4 @@ export * from "@/types/project";
 export * from "@/types/business";
 export * from "@/types/guide";
 export * from "@/types/plan";
+export * from "@/types/billing";
