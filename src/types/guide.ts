@@ -5,6 +5,7 @@ export interface GuideSummary {
   excerpt: string | null;
   featuredImageUrl: string | null;
   categoryName: string | null;
+  categorySlug: string | null;
   publishedAt: string | null;
 }
 

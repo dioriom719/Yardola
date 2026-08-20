@@ -42,6 +42,7 @@ export interface ProjectDetail {
   categories: { name: string; slug: string }[];
   styles: { name: string; slug: string }[];
   features: { name: string; slug: string }[];
+  services: { name: string; slug: string }[];
   business: {
     id: string;
     slug: string;

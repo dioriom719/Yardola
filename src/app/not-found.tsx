@@ -2,6 +2,12 @@ import Link from "next/link";
 import { CompassIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Page Not Found | Yardola",
+  robots: { index: false, follow: true },
+};
 
 export default function NotFound() {
   return (

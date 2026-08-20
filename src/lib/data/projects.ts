@@ -243,6 +243,7 @@ interface ProjectDetailRow {
   project_categories: { categories: { name: string; slug: string } | null }[];
   project_styles: { styles: { name: string; slug: string } | null }[];
   project_features: { features: { name: string; slug: string } | null }[];
+  project_services: { services: { name: string; slug: string } | null }[];
   businesses: {
     id: string;
     slug: string;
@@ -262,6 +263,7 @@ const PROJECT_DETAIL_SELECT = `
   project_categories(categories(name, slug)),
   project_styles(styles(name, slug)),
   project_features(features(name, slug)),
+  project_services(services(name, slug)),
   businesses(id, slug, name, logo_url, verification_status, city, state)
 `;
 
@@ -297,6 +299,9 @@ function mapProjectDetail(row: ProjectDetailRow): ProjectDetail {
     features: row.project_features
       .map((pf) => pf.features)
       .filter((f): f is { name: string; slug: string } => f !== null),
+    services: row.project_services
+      .map((ps) => ps.services)
+      .filter((s): s is { name: string; slug: string } => s !== null),
     business: {
       id: row.businesses?.id ?? "",
       slug: row.businesses?.slug ?? "",
@@ -326,70 +331,198 @@ export async function getProjectBySlug(
 }
 
 /**
- * Similar projects, using category/location as the relevance signal (no
- * ML recommendations). Prefers same-category matches, then fills any
- * remaining slots with same-city matches.
+ * One relevance tier for listSimilarProjects: published projects
+ * matching a direct column (e.g. city_id) or an !inner-joined child
+ * table restricted to a set of ids (e.g. project_categories.category_id
+ * in [...]), excluding ids already found by an earlier tier.
+ */
+async function fetchSimilarProjectsTier(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  opts: {
+    excludeIds: Set<string>;
+    limit: number;
+    directColumn?: { column: string; value: string };
+    joinedIn?: { table: string; column: string; values: string[] };
+  }
+): Promise<ProjectCardRow[]> {
+  if (opts.limit <= 0) return [];
+  if (opts.joinedIn && opts.joinedIn.values.length === 0) return [];
+
+  // PROJECT_CARD_FIELDS already embeds project_categories/project_styles
+  // for display -- embedding the same table again with `!inner` for
+  // filtering produces a duplicate embed of the same table, which
+  // PostgREST/Postgres rejects ("aggregate functions are not allowed in
+  // FROM clause of their own query level"). When the join target is one
+  // of those two tables, upgrade the existing display embed to `!inner`
+  // instead of adding a second one; otherwise (project_features,
+  // project_services) append a separate minimal embed as before.
+  const joinTable = opts.joinedIn?.table;
+  const categoriesEmbed =
+    joinTable === "project_categories"
+      ? "project_categories!inner(categories(name, slug))"
+      : "project_categories(categories(name, slug))";
+  const stylesEmbed =
+    joinTable === "project_styles"
+      ? "project_styles!inner(styles(name))"
+      : "project_styles(styles(name))";
+  const extraEmbed =
+    opts.joinedIn &&
+    joinTable !== "project_categories" &&
+    joinTable !== "project_styles"
+      ? `, ${joinTable}!inner(${opts.joinedIn!.column})`
+      : "";
+
+  const fields = `id, slug, title, budget_range,
+       cities(name, slug),
+       ${categoriesEmbed},
+       ${stylesEmbed},
+       project_photos(url, alt_text),
+       businesses(name, slug)${extraEmbed}`;
+
+  let query = supabase
+    .from("projects")
+    .select(fields)
+    .eq("status", "published")
+    .eq("project_photos.photo_type", "hero")
+    .limit(1, { foreignTable: "project_photos" })
+    .limit(1, { foreignTable: "project_categories" })
+    .limit(1, { foreignTable: "project_styles" });
+
+  if (opts.directColumn) {
+    query = query.eq(opts.directColumn.column, opts.directColumn.value);
+  }
+  if (opts.joinedIn) {
+    query = query.in(
+      `${opts.joinedIn.table}.${opts.joinedIn.column}`,
+      opts.joinedIn.values
+    );
+  }
+  if (opts.excludeIds.size > 0) {
+    query = query.not("id", "in", `(${[...opts.excludeIds].join(",")})`);
+  }
+
+  const { data, error } = await query
+    .order("created_at", { ascending: false })
+    .limit(opts.limit)
+    .returns<ProjectCardRow[]>();
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+/**
+ * Similar projects, using database relationships as the relevance
+ * signal (no ML recommendations) in priority order: same category,
+ * same location, same style, shared features, shared services. Each
+ * tier only runs if earlier tiers haven't already filled the quota.
  */
 export async function listSimilarProjects(
   project: ProjectDetail,
   limit = 4
 ): Promise<ProjectCardData[]> {
   const supabase = await createClient();
-  const cardSelect = PROJECT_CARD_FIELDS;
-
   const results: ProjectCardRow[] = [];
   const seenIds = new Set([project.id]);
 
-  const categorySlug = project.categories[0]?.slug;
-  if (categorySlug) {
-    const category = await getCategoryBySlug(categorySlug);
-    if (category) {
-      const { data, error } = await supabase
-        .from("projects")
-        .select(cardSelect)
-        .eq("status", "published")
-        .neq("id", project.id)
-        .eq("project_categories.category_id", category.id)
-        .eq("project_photos.photo_type", "hero")
-        .limit(1, { foreignTable: "project_photos" })
-        .limit(1, { foreignTable: "project_categories" })
-        .limit(1, { foreignTable: "project_styles" })
-        .order("created_at", { ascending: false })
-        .limit(limit)
-        .returns<ProjectCardRow[]>();
-      if (error) throw error;
-      for (const row of data ?? []) {
-        if (!seenIds.has(row.id)) {
-          results.push(row);
-          seenIds.add(row.id);
-        }
-      }
-    }
-  }
-
-  if (results.length < limit) {
-    const remaining = limit - results.length;
-    const { data, error } = await supabase
-      .from("projects")
-      .select(cardSelect)
-      .eq("status", "published")
-      .eq("city_id", (await getCityBySlug(project.citySlug))?.id ?? "")
-      .not("id", "in", `(${[...seenIds].join(",")})`)
-      .eq("project_photos.photo_type", "hero")
-      .limit(1, { foreignTable: "project_photos" })
-      .limit(1, { foreignTable: "project_categories" })
-      .limit(1, { foreignTable: "project_styles" })
-      .order("created_at", { ascending: false })
-      .limit(remaining)
-      .returns<ProjectCardRow[]>();
-    if (error) throw error;
-    for (const row of data ?? []) {
+  async function runTier(fetch: () => Promise<ProjectCardRow[]>) {
+    if (results.length >= limit) return;
+    const rows = await fetch();
+    for (const row of rows) {
+      if (results.length >= limit) break;
       if (!seenIds.has(row.id)) {
         results.push(row);
         seenIds.add(row.id);
       }
     }
   }
+
+  const categoryIds = await Promise.all(
+    project.categories.map((c) => getCategoryBySlug(c.slug))
+  ).then((cats) =>
+    cats.filter((c): c is NonNullable<typeof c> => c !== null).map((c) => c.id)
+  );
+
+  await runTier(() =>
+    fetchSimilarProjectsTier(supabase, {
+      excludeIds: seenIds,
+      limit: limit - results.length,
+      joinedIn: {
+        table: "project_categories",
+        column: "category_id",
+        values: categoryIds,
+      },
+    })
+  );
+
+  const city = await getCityBySlug(project.citySlug);
+  await runTier(() =>
+    fetchSimilarProjectsTier(supabase, {
+      excludeIds: seenIds,
+      limit: limit - results.length,
+      directColumn: city ? { column: "city_id", value: city.id } : undefined,
+    })
+  );
+
+  const styleIds = await Promise.all(
+    project.styles.map((s) => getStyleBySlug(s.slug))
+  ).then((styles) =>
+    styles
+      .filter((s): s is NonNullable<typeof s> => s !== null)
+      .map((s) => s.id)
+  );
+  await runTier(() =>
+    fetchSimilarProjectsTier(supabase, {
+      excludeIds: seenIds,
+      limit: limit - results.length,
+      joinedIn: {
+        table: "project_styles",
+        column: "style_id",
+        values: styleIds,
+      },
+    })
+  );
+
+  const { data: featureRows } = project.features.length
+    ? await supabase
+        .from("features")
+        .select("id")
+        .in(
+          "slug",
+          project.features.map((f) => f.slug)
+        )
+    : { data: [] as { id: string }[] | null };
+  await runTier(() =>
+    fetchSimilarProjectsTier(supabase, {
+      excludeIds: seenIds,
+      limit: limit - results.length,
+      joinedIn: {
+        table: "project_features",
+        column: "feature_id",
+        values: (featureRows ?? []).map((f) => f.id),
+      },
+    })
+  );
+
+  const { data: serviceRows } = project.services.length
+    ? await supabase
+        .from("services")
+        .select("id")
+        .in(
+          "slug",
+          project.services.map((s) => s.slug)
+        )
+    : { data: [] as { id: string }[] | null };
+  await runTier(() =>
+    fetchSimilarProjectsTier(supabase, {
+      excludeIds: seenIds,
+      limit: limit - results.length,
+      joinedIn: {
+        table: "project_services",
+        column: "service_id",
+        values: (serviceRows ?? []).map((s) => s.id),
+      },
+    })
+  );
 
   return results.slice(0, limit).map(mapProjectCard);
 }

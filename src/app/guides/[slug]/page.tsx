@@ -1,14 +1,27 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { PageBreadcrumbs } from "@/components/yardola/page-breadcrumbs";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
+import { JsonLd } from "@/components/seo/json-ld";
+import { ProjectGrid } from "@/components/yardola/project-grid";
+import { BusinessGrid } from "@/components/yardola/business-grid";
 import { getGuideBySlug, listRelatedGuides } from "@/lib/data/guides";
+import { getCategoryBySlug } from "@/lib/data/categories";
+import { listProjects } from "@/lib/data/projects";
+import { listBusinesses } from "@/lib/data/businesses";
+import { generateGuideMetadata } from "@/lib/seo/metadata";
+import { getGuideIndexability } from "@/lib/seo/indexability";
+import { buildArticleJsonLd } from "@/lib/seo/structured-data";
+import type { Metadata } from "next";
 
-export async function generateMetadata(props: PageProps<"/guides/[slug]">) {
+export async function generateMetadata(
+  props: PageProps<"/guides/[slug]">
+): Promise<Metadata> {
   const { slug } = await props.params;
   const guide = await getGuideBySlug(slug);
-  if (!guide) return { title: "Yardola" };
-  return { title: `${guide.title} | Yardola Guide` };
+  if (!guide)
+    return { title: "Yardola", robots: { index: false, follow: true } };
+  return generateGuideMetadata(guide, getGuideIndexability(guide).index);
 }
 
 export default async function GuidePage(props: PageProps<"/guides/[slug]">) {
@@ -16,11 +29,30 @@ export default async function GuidePage(props: PageProps<"/guides/[slug]">) {
   const guide = await getGuideBySlug(slug);
   if (!guide) notFound();
 
-  const relatedGuides = await listRelatedGuides(guide.slug, 3);
+  const category = guide.categorySlug
+    ? await getCategoryBySlug(guide.categorySlug)
+    : null;
+
+  const [relatedGuides, relatedProjects, relatedBusinesses] = await Promise.all(
+    [
+      listRelatedGuides(guide.slug, { categoryId: category?.id, limit: 3 }),
+      category
+        ? listProjects({ categorySlug: category.slug }, 1, 3).then(
+            (r) => r.items
+          )
+        : Promise.resolve([]),
+      category
+        ? listBusinesses({ categorySlug: category.slug }, 1, 3).then(
+            (r) => r.items
+          )
+        : Promise.resolve([]),
+    ]
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-      <PageBreadcrumbs
+      <JsonLd data={buildArticleJsonLd(guide)} />
+      <SeoBreadcrumbs
         items={[
           { label: "Home", href: "/" },
           { label: "Guides", href: "/guides" },
@@ -30,9 +62,12 @@ export default async function GuidePage(props: PageProps<"/guides/[slug]">) {
 
       <div className="mt-4">
         {guide.categoryName && (
-          <span className="text-primary text-xs font-medium tracking-wide uppercase">
+          <Link
+            href={category ? `/projects/${category.slug}` : "/guides"}
+            className="text-primary text-xs font-medium tracking-wide uppercase hover:underline"
+          >
             {guide.categoryName}
-          </span>
+          </Link>
         )}
         <h1 className="font-display text-foreground mt-1 text-3xl sm:text-4xl">
           {guide.title}
@@ -75,6 +110,44 @@ export default async function GuidePage(props: PageProps<"/guides/[slug]">) {
               )
             )}
         </div>
+      )}
+
+      {relatedProjects.length > 0 && category && (
+        <section className="border-border mt-16 border-t pt-10">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <h2 className="font-display text-foreground text-xl">
+              {category.name} projects for inspiration
+            </h2>
+            <Link
+              href={`/projects/${category.slug}`}
+              className="text-primary text-sm font-medium hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="mt-6">
+            <ProjectGrid projects={relatedProjects} />
+          </div>
+        </section>
+      )}
+
+      {relatedBusinesses.length > 0 && category && (
+        <section className="border-border mt-16 border-t pt-10">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <h2 className="font-display text-foreground text-xl">
+              Professionals for {category.name.toLowerCase()}
+            </h2>
+            <Link
+              href="/professionals"
+              className="text-primary text-sm font-medium hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="mt-6">
+            <BusinessGrid businesses={relatedBusinesses} />
+          </div>
+        </section>
       )}
 
       {relatedGuides.length > 0 && (

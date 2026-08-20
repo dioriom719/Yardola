@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PageBreadcrumbs } from "@/components/yardola/page-breadcrumbs";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { SearchBar } from "@/components/yardola/search-bar";
 import { FilterBar } from "@/components/yardola/filter-bar";
 import { BusinessGrid } from "@/components/yardola/business-grid";
@@ -11,10 +11,37 @@ import { listCategories } from "@/lib/data/categories";
 import { listCities } from "@/lib/data/locations";
 import { listBusinesses, type BusinessFilters } from "@/lib/data/businesses";
 import { paramInt, paramString } from "@/lib/search-params";
+import { buildMetadata } from "@/lib/seo/metadata";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Backyard Professionals in Las Vegas | Yardola",
-};
+const TITLE = "Backyard Professionals in Las Vegas | Yardola";
+const DESCRIPTION =
+  "Portfolios from the businesses building Las Vegas backyards on Yardola -- browse by category or location.";
+
+/**
+ * `/professionals` itself (no filters) is a legitimate indexable
+ * directory hub. Filtered views are faceted navigation: noindex, with
+ * the canonical pointing back at the unfiltered directory (there's no
+ * approved `/professionals/[category]/[location]` tier to canonicalize
+ * to, unlike `/projects`).
+ */
+export async function generateMetadata(
+  props: PageProps<"/professionals">
+): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const hasAnyFilter = Boolean(
+    paramString(searchParams, "category") ||
+    paramString(searchParams, "location") ||
+    paramString(searchParams, "q")
+  );
+
+  return buildMetadata({
+    title: TITLE,
+    description: DESCRIPTION,
+    path: "/professionals",
+    index: !hasAnyFilter,
+  });
+}
 
 export default async function ProfessionalsPage(
   props: PageProps<"/professionals">
@@ -48,7 +75,7 @@ export default async function ProfessionalsPage(
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <PageBreadcrumbs
+      <SeoBreadcrumbs
         items={[{ label: "Home", href: "/" }, { label: "Professionals" }]}
       />
 

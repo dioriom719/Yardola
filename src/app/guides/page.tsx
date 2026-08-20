@@ -1,20 +1,25 @@
 import Link from "next/link";
 import Image from "next/image";
-import { PageBreadcrumbs } from "@/components/yardola/page-breadcrumbs";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { EmptyState } from "@/components/ui/empty-state";
 import { BookOpen } from "lucide-react";
 import { listGuides } from "@/lib/data/guides";
+import { buildMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
+export const metadata = buildMetadata({
   title: "Yardola Guide | Backyard Project Advice",
-};
+  description:
+    "Ideas, advice, and planning tips for backyard projects in Las Vegas -- from budgeting to choosing a style.",
+  path: "/guides",
+  index: true,
+});
 
 export default async function GuidesPage() {
   const guides = await listGuides();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <PageBreadcrumbs
+      <SeoBreadcrumbs
         items={[{ label: "Home", href: "/" }, { label: "Guides" }]}
       />
 
@@ -50,7 +55,7 @@ export default async function GuidesPage() {
                   </div>
                 )}
                 <div className="p-4">
-                  {guide.categoryName && (
+                  {guide.categoryName && guide.categorySlug && (
                     <span className="text-primary text-xs font-medium tracking-wide uppercase">
                       {guide.categoryName}
                     </span>

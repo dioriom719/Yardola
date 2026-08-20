@@ -4,19 +4,29 @@ import { notFound } from "next/navigation";
 import { BadgeCheck, Globe, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PageBreadcrumbs } from "@/components/yardola/page-breadcrumbs";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
+import { JsonLd } from "@/components/seo/json-ld";
 import { ProjectGrid } from "@/components/yardola/project-grid";
 import { getBusinessBySlug } from "@/lib/data/businesses";
-import { listGuides } from "@/lib/data/guides";
+import { getCategoryBySlug } from "@/lib/data/categories";
+import { listRelatedGuides } from "@/lib/data/guides";
 import { formatVerificationStatus } from "@/lib/format";
+import { generateBusinessMetadata } from "@/lib/seo/metadata";
+import { getBusinessIndexability } from "@/lib/seo/indexability";
+import { buildBusinessJsonLd } from "@/lib/seo/structured-data";
+import type { Metadata } from "next";
 
 export async function generateMetadata(
   props: PageProps<"/professionals/[slug]">
-) {
+): Promise<Metadata> {
   const { slug } = await props.params;
   const business = await getBusinessBySlug(slug);
-  if (!business) return { title: "Yardola" };
-  return { title: `${business.name} | Yardola` };
+  if (!business)
+    return { title: "Yardola", robots: { index: false, follow: true } };
+  return generateBusinessMetadata(
+    business,
+    getBusinessIndexability(business).index
+  );
 }
 
 export default async function ProfessionalPage(
@@ -27,11 +37,30 @@ export default async function ProfessionalPage(
   if (!business) notFound();
 
   const location = [business.city, business.state].filter(Boolean).join(", ");
-  const guides = business.services.length > 0 ? await listGuides(3) : [];
+
+  const relevantCategories = [
+    ...new Map(
+      business.services
+        .filter((s) => s.categorySlug)
+        .map((s) => [
+          s.categorySlug,
+          { name: s.categoryName, slug: s.categorySlug },
+        ])
+    ).values(),
+  ];
+
+  const primaryCategory =
+    relevantCategories.length > 0
+      ? await getCategoryBySlug(relevantCategories[0].slug)
+      : null;
+  const guides = primaryCategory
+    ? await listRelatedGuides("", { categoryId: primaryCategory.id, limit: 3 })
+    : [];
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <PageBreadcrumbs
+      <JsonLd data={buildBusinessJsonLd(business)} />
+      <SeoBreadcrumbs
         items={[
           { label: "Home", href: "/" },
           { label: "Professionals", href: "/professionals" },
@@ -128,6 +157,16 @@ export default async function ProfessionalPage(
               </ul>
             )}
 
+          {relevantCategories.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {relevantCategories.map((category) => (
+                <Link key={category.slug} href={`/projects/${category.slug}`}>
+                  <Badge variant="outline">{category.name}</Badge>
+                </Link>
+              ))}
+            </div>
+          )}
+
           {/* Portfolio */}
           <section className="mt-10">
             <h2 className="font-display text-foreground text-xl">Portfolio</h2>
@@ -151,14 +190,26 @@ export default async function ProfessionalPage(
             </div>
           )}
 
-          {business.serviceAreaCityNames.length > 0 && (
+          {business.serviceAreas.length > 0 && (
             <div className="border-border bg-card rounded-lg border p-5">
               <h2 className="font-display text-foreground text-lg">
                 Service Areas
               </h2>
-              <p className="text-muted-foreground mt-3 text-sm">
-                {business.serviceAreaCityNames.join(", ")}
-              </p>
+              <div className="mt-3 flex flex-wrap gap-x-1 gap-y-2 text-sm">
+                {business.serviceAreas.map((area, index) => (
+                  <span key={area.slug}>
+                    <Link
+                      href={`/locations/${area.slug}`}
+                      className="text-foreground hover:text-primary hover:underline"
+                    >
+                      {area.name}
+                    </Link>
+                    {index < business.serviceAreas.length - 1 && (
+                      <span className="text-muted-foreground">, </span>
+                    )}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
 

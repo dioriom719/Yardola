@@ -2,10 +2,16 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { buildMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
+// Planner pages are explicitly noindex -- there's no useful content here
+// yet, just a placeholder for the CTA destination.
+export const metadata = buildMetadata({
   title: "Plan My Project | Yardola",
-};
+  description: "The Yardola project planner is coming soon.",
+  path: "/plan",
+  index: false,
+});
 
 /**
  * Placeholder destination for every "Plan My Project" CTA across the

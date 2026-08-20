@@ -3,7 +3,8 @@ import Image from "next/image";
 import { BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PageBreadcrumbs } from "@/components/yardola/page-breadcrumbs";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
+import { JsonLd } from "@/components/seo/json-ld";
 import { ProjectGallery } from "@/components/yardola/project-gallery";
 import { ProjectGrid } from "@/components/yardola/project-grid";
 import {
@@ -12,6 +13,9 @@ import {
   formatPropertyType,
 } from "@/lib/format";
 import { listSimilarProjects } from "@/lib/data/projects";
+import { listRelatedGuides } from "@/lib/data/guides";
+import { getCategoryBySlug } from "@/lib/data/categories";
+import { buildProjectJsonLd } from "@/lib/seo/structured-data";
 import type { ProjectDetail } from "@/types/project";
 
 interface ProjectDetailViewProps {
@@ -19,8 +23,18 @@ interface ProjectDetailViewProps {
 }
 
 export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
-  const similarProjects = await listSimilarProjects(project, 4);
   const primaryCategory = project.categories[0] ?? null;
+
+  const [similarProjects, relatedGuides] = await Promise.all([
+    listSimilarProjects(project, 4),
+    primaryCategory
+      ? getCategoryBySlug(primaryCategory.slug).then((category) =>
+          category
+            ? listRelatedGuides("", { categoryId: category.id, limit: 2 })
+            : []
+        )
+      : Promise.resolve([]),
+  ]);
 
   const details: { label: string; value: string }[] = [
     {
@@ -40,7 +54,8 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <PageBreadcrumbs
+      <JsonLd data={buildProjectJsonLd(project)} />
+      <SeoBreadcrumbs
         items={[
           { label: "Home", href: "/" },
           { label: "Projects", href: "/projects" },
@@ -52,6 +67,19 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
                 },
               ]
             : []),
+          ...(primaryCategory
+            ? [
+                {
+                  label: project.cityName,
+                  href: `/projects/${primaryCategory.slug}/${project.citySlug}`,
+                },
+              ]
+            : [
+                {
+                  label: project.cityName,
+                  href: `/locations/${project.citySlug}`,
+                },
+              ]),
           { label: project.title },
         ]}
       />
@@ -188,12 +216,43 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
 
       {similarProjects.length > 0 && (
         <section className="border-border mt-16 border-t pt-12">
-          <h2 className="font-display text-foreground text-2xl">
-            Similar projects
-          </h2>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <h2 className="font-display text-foreground text-2xl">
+              Similar projects
+            </h2>
+            {primaryCategory && (
+              <Link
+                href={`/projects/${primaryCategory.slug}/${project.citySlug}`}
+                className="text-primary text-sm font-medium hover:underline"
+              >
+                More {primaryCategory.name.toLowerCase()} projects in{" "}
+                {project.cityName}
+              </Link>
+            )}
+          </div>
           <div className="mt-6">
             <ProjectGrid projects={similarProjects} />
           </div>
+        </section>
+      )}
+
+      {relatedGuides.length > 0 && (
+        <section className="border-border mt-16 border-t pt-12">
+          <h2 className="font-display text-foreground text-2xl">
+            Guides you might like
+          </h2>
+          <ul className="mt-6 space-y-3">
+            {relatedGuides.map((guide) => (
+              <li key={guide.id}>
+                <Link
+                  href={`/guides/${guide.slug}`}
+                  className="text-foreground hover:text-primary focus-visible:ring-ring underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                >
+                  {guide.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
     </div>

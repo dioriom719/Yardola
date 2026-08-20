@@ -39,8 +39,13 @@ export interface BusinessDetail {
     yearEstablished: number | null;
     highlights: string[];
   } | null;
-  services: { name: string; slug: string; categoryName: string }[];
-  serviceAreaCityNames: string[];
+  services: {
+    name: string;
+    slug: string;
+    categoryName: string;
+    categorySlug: string;
+  }[];
+  serviceAreas: { name: string; slug: string }[];
   professionals: Professional[];
   projects: ProjectCardData[];
 }

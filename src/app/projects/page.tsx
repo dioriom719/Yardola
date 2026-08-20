@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PageBreadcrumbs } from "@/components/yardola/page-breadcrumbs";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { SearchBar } from "@/components/yardola/search-bar";
 import { FilterBar } from "@/components/yardola/filter-bar";
 import { ProjectGrid } from "@/components/yardola/project-grid";
@@ -11,12 +11,59 @@ import { listCities } from "@/lib/data/locations";
 import { listStyles } from "@/lib/data/styles";
 import { listProjects, type ProjectFilters } from "@/lib/data/projects";
 import { paramInt, paramString } from "@/lib/search-params";
+import { buildMetadata } from "@/lib/seo/metadata";
 import { SearchX } from "lucide-react";
+import type { Metadata } from "next";
 import type { BudgetRange } from "@/types/enums";
 
-export const metadata = {
-  title: "Explore Backyard Projects | Yardola",
-};
+const TITLE = "Explore Backyard Projects | Yardola";
+const DESCRIPTION =
+  "Browse real backyard transformations from Las Vegas professionals across every category and location.";
+
+/**
+ * `/projects` itself (no filters) is a legitimate, valuable indexable
+ * hub. Any filtered/search view is faceted navigation -- noindex, with
+ * a canonical pointing at the closest real hub (a category or
+ * category+location page) when the active filters match one exactly.
+ */
+export async function generateMetadata(
+  props: PageProps<"/projects">
+): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const categorySlug = paramString(searchParams, "category");
+  const locationSlug = paramString(searchParams, "location");
+  const styleSlug = paramString(searchParams, "style");
+  const budget = paramString(searchParams, "budget");
+  const q = paramString(searchParams, "q");
+
+  const hasAnyFilter = Boolean(
+    categorySlug || locationSlug || styleSlug || budget || q
+  );
+  if (!hasAnyFilter) {
+    return buildMetadata({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: "/projects",
+      index: true,
+    });
+  }
+
+  const onlyCategoryAndMaybeLocation =
+    categorySlug && !styleSlug && !budget && !q;
+  const canonicalPath =
+    onlyCategoryAndMaybeLocation && locationSlug
+      ? `/projects/${categorySlug}/${locationSlug}`
+      : onlyCategoryAndMaybeLocation
+        ? `/projects/${categorySlug}`
+        : "/projects";
+
+  return buildMetadata({
+    title: TITLE,
+    description: DESCRIPTION,
+    path: canonicalPath,
+    index: false,
+  });
+}
 
 export default async function ProjectsPage(props: PageProps<"/projects">) {
   const searchParams = await props.searchParams;
@@ -53,7 +100,7 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <PageBreadcrumbs
+      <SeoBreadcrumbs
         items={[{ label: "Home", href: "/" }, { label: "Projects" }]}
       />
 

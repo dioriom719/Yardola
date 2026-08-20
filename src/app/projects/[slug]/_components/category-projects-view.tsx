@@ -2,10 +2,8 @@ import Link from "next/link";
 import { SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import {
-  PageBreadcrumbs,
-  type BreadcrumbEntry,
-} from "@/components/yardola/page-breadcrumbs";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
+import { type BreadcrumbEntry } from "@/components/yardola/page-breadcrumbs";
 import { ProjectGrid } from "@/components/yardola/project-grid";
 import { BusinessGrid } from "@/components/yardola/business-grid";
 import { CategoryCard } from "@/components/yardola/category-card";
@@ -16,6 +14,8 @@ import {
   listOtherCategories,
   listCategoriesWithSampleImage,
 } from "@/lib/data/categories";
+import { listCitiesWithPublishedProjectsForCategory } from "@/lib/data/locations";
+import { listRelatedGuides } from "@/lib/data/guides";
 import type { Category } from "@/types/category";
 import type { City } from "@/types/location";
 
@@ -36,10 +36,21 @@ export async function CategoryProjectsView({
   page,
   basePath,
 }: CategoryProjectsViewProps) {
-  const [projectResult, professionals, relatedCategories] = await Promise.all([
+  const [
+    projectResult,
+    professionals,
+    relatedCategories,
+    relatedLocations,
+    relatedGuides,
+  ] = await Promise.all([
     listProjects({ categorySlug: category.slug, citySlug: city?.slug }, page),
     listBusinesses({ categorySlug: category.slug, citySlug: city?.slug }, 1, 4),
     listOtherCategories(category.slug, 4).then(listCategoriesWithSampleImage),
+    listCitiesWithPublishedProjectsForCategory(category.id, {
+      excludeCitySlug: city?.slug,
+      limit: 4,
+    }),
+    listRelatedGuides("", { categoryId: category.id, limit: 3 }),
   ]);
 
   const breadcrumbItems: BreadcrumbEntry[] = [
@@ -53,7 +64,7 @@ export async function CategoryProjectsView({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <PageBreadcrumbs items={breadcrumbItems} />
+      <SeoBreadcrumbs items={breadcrumbItems} />
 
       <div className="mt-4 max-w-2xl">
         <h1 className="font-display text-foreground text-3xl sm:text-4xl">
@@ -129,6 +140,28 @@ export async function CategoryProjectsView({
         </section>
       )}
 
+      {relatedLocations.length > 0 && (
+        <section className="border-border mt-16 border-t pt-12">
+          <h2 className="font-display text-foreground text-2xl">
+            {city ? "Other locations" : "Browse by location"}
+          </h2>
+          <p className="text-muted-foreground mt-2 text-sm">
+            {category.name} projects in nearby areas.
+          </p>
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {relatedLocations.map((related) => (
+              <Link
+                key={related.id}
+                href={`/projects/${category.slug}/${related.slug}`}
+                className="border-border bg-card hover:border-primary/40 focus-visible:ring-ring rounded-lg border p-4 font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              >
+                {category.name} in {related.name}, {related.stateAbbreviation}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {relatedCategories.length > 0 && (
         <section className="border-border mt-16 border-t pt-12">
           <h2 className="font-display text-foreground text-2xl">
@@ -136,9 +169,35 @@ export async function CategoryProjectsView({
           </h2>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {relatedCategories.map((related) => (
-              <CategoryCard key={related.id} category={related} />
+              <CategoryCard
+                key={related.id}
+                category={related}
+                href={
+                  city ? `/projects/${related.slug}/${city.slug}` : undefined
+                }
+              />
             ))}
           </div>
+        </section>
+      )}
+
+      {relatedGuides.length > 0 && (
+        <section className="border-border mt-16 border-t pt-12">
+          <h2 className="font-display text-foreground text-2xl">
+            Related guides
+          </h2>
+          <ul className="mt-6 space-y-3">
+            {relatedGuides.map((guide) => (
+              <li key={guide.id}>
+                <Link
+                  href={`/guides/${guide.slug}`}
+                  className="text-foreground hover:text-primary focus-visible:ring-ring underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                >
+                  {guide.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
     </div>

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PageBreadcrumbs } from "@/components/yardola/page-breadcrumbs";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { ProjectGrid } from "@/components/yardola/project-grid";
 import { BusinessGrid } from "@/components/yardola/business-grid";
 import { CategoryCard } from "@/components/yardola/category-card";
@@ -16,14 +16,24 @@ import {
   listCategoriesWithSampleImage,
 } from "@/lib/data/categories";
 import { paramInt } from "@/lib/search-params";
+import { generateLocationMetadata } from "@/lib/seo/metadata";
+import { getLocationIndexability } from "@/lib/seo/indexability";
+import type { Metadata } from "next";
 
-export async function generateMetadata(props: PageProps<"/locations/[slug]">) {
+export async function generateMetadata(
+  props: PageProps<"/locations/[slug]">
+): Promise<Metadata> {
   const { slug } = await props.params;
+  const searchParams = await props.searchParams;
+  const page = paramInt(searchParams, "page", 1);
+
   const city = await getCityBySlug(slug);
-  if (!city) return { title: "Yardola" };
-  return {
-    title: `Backyard Projects in ${city.name}, ${city.stateAbbreviation} | Yardola`,
-  };
+  if (!city)
+    return { title: "Yardola", robots: { index: false, follow: true } };
+
+  const { index } = await getLocationIndexability(city);
+  // Only the first page of a paginated hub is treated as canonical/indexable.
+  return generateLocationMetadata(city, index && page === 1);
 }
 
 export default async function LocationPage(
@@ -46,7 +56,7 @@ export default async function LocationPage(
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <PageBreadcrumbs
+      <SeoBreadcrumbs
         items={[
           { label: "Home", href: "/" },
           { label: "Locations" },

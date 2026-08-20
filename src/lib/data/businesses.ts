@@ -185,10 +185,10 @@ interface BusinessDetailRow {
     services: {
       name: string;
       slug: string;
-      categories: { name: string } | null;
+      categories: { name: string; slug: string } | null;
     } | null;
   }[];
-  business_service_areas: { cities: { name: string } | null }[];
+  business_service_areas: { cities: { name: string; slug: string } | null }[];
   professionals: {
     id: string;
     name: string;
@@ -201,8 +201,8 @@ interface BusinessDetailRow {
 const BUSINESS_DETAIL_SELECT = `
   id, slug, name, description, website, phone, logo_url, city, state, verification_status,
   business_profiles(tagline, about, year_established, highlights),
-  business_services(services(name, slug, categories(name))),
-  business_service_areas(cities(name)),
+  business_services(services(name, slug, categories(name, slug))),
+  business_service_areas(cities(name, slug)),
   professionals(id, name, title, bio, photo_url)
 `;
 
@@ -249,17 +249,18 @@ export async function getBusinessBySlug(
         ): s is {
           name: string;
           slug: string;
-          categories: { name: string } | null;
+          categories: { name: string; slug: string } | null;
         } => s !== null
       )
       .map((s) => ({
         name: s.name,
         slug: s.slug,
         categoryName: s.categories?.name ?? "",
+        categorySlug: s.categories?.slug ?? "",
       })),
-    serviceAreaCityNames: data.business_service_areas
-      .map((a) => a.cities?.name)
-      .filter((name): name is string => Boolean(name)),
+    serviceAreas: data.business_service_areas
+      .map((a) => a.cities)
+      .filter((city): city is { name: string; slug: string } => Boolean(city)),
     professionals: data.professionals.map((p) => ({
       id: p.id,
       name: p.name,

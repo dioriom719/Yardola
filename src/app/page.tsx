@@ -12,6 +12,9 @@ import {
 import { listFeaturedProjects } from "@/lib/data/projects";
 import { listFeaturedBusinesses } from "@/lib/data/businesses";
 import { listGuides } from "@/lib/data/guides";
+import { generateHomeMetadata } from "@/lib/seo/metadata";
+
+export const metadata = generateHomeMetadata();
 
 const STEPS = [
   {

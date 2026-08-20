@@ -2,26 +2,17 @@ import { notFound } from "next/navigation";
 import { getCategoryBySlug } from "@/lib/data/categories";
 import { getProjectBySlug } from "@/lib/data/projects";
 import { paramInt } from "@/lib/search-params";
+import {
+  generateCategoryMetadata,
+  generateProjectMetadata,
+} from "@/lib/seo/metadata";
+import {
+  getCategoryIndexability,
+  getProjectIndexability,
+} from "@/lib/seo/indexability";
 import { CategoryProjectsView } from "./_components/category-projects-view";
 import { ProjectDetailView } from "./_components/project-detail-view";
-
-// Basic per-page titles only -- canonicals, structured data, and the
-// rest of the SEO system land in a later phase.
-export async function generateMetadata(props: PageProps<"/projects/[slug]">) {
-  const { slug } = await props.params;
-
-  const category = await getCategoryBySlug(slug);
-  if (category) {
-    return { title: `${category.name} Projects | Yardola` };
-  }
-
-  const project = await getProjectBySlug(slug);
-  if (project) {
-    return { title: `${project.title} | Yardola` };
-  }
-
-  return { title: "Yardola" };
-}
+import type { Metadata } from "next";
 
 /**
  * `/projects/[slug]` serves two different kinds of content under one URL
@@ -33,6 +24,32 @@ export async function generateMetadata(props: PageProps<"/projects/[slug]">) {
  * so that's the safe tie-breaker if a project ever shared a slug with a
  * category.
  */
+export async function generateMetadata(
+  props: PageProps<"/projects/[slug]">
+): Promise<Metadata> {
+  const { slug } = await props.params;
+
+  const category = await getCategoryBySlug(slug);
+  if (category) {
+    const searchParams = await props.searchParams;
+    const page = paramInt(searchParams, "page", 1);
+    const { index } = await getCategoryIndexability(category);
+    // Only the first page of a paginated hub is treated as canonical /
+    // indexable -- deeper pages are near-duplicates of the same content.
+    return generateCategoryMetadata(category, index && page === 1);
+  }
+
+  const project = await getProjectBySlug(slug);
+  if (project) {
+    return generateProjectMetadata(
+      project,
+      getProjectIndexability(project).index
+    );
+  }
+
+  return { title: "Yardola", robots: { index: false, follow: true } };
+}
+
 export default async function ProjectOrCategoryPage(
   props: PageProps<"/projects/[slug]">
 ) {
