@@ -1,32 +1,52 @@
 import Link from "next/link";
-import { Compass, Ruler, Users } from "lucide-react";
+import { Compass, Sparkles, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { CategoryCard } from "@/components/yardola/category-card";
+import { ProjectCard } from "@/components/yardola/project-card";
+import { BusinessCard } from "@/components/yardola/business-card";
+import {
+  listCategories,
+  listCategoriesWithSampleImage,
+} from "@/lib/data/categories";
+import { listFeaturedProjects } from "@/lib/data/projects";
+import { listFeaturedBusinesses } from "@/lib/data/businesses";
+import { listGuides } from "@/lib/data/guides";
 
 const STEPS = [
   {
+    number: "01",
     icon: Compass,
-    title: "Discover",
-    description:
-      "Browse real backyard transformations -- pools, patios, turf, outdoor kitchens, and more -- for inspiration.",
+    title: "Explore",
+    description: "Find real backyard projects.",
   },
   {
-    icon: Ruler,
+    number: "02",
+    icon: Sparkles,
     title: "Plan",
-    description:
-      "Shape your project idea, understand scope, and get a feel for what it takes to bring it to life.",
+    description: "Build your project plan.",
   },
   {
+    number: "03",
     icon: Users,
-    title: "Build",
-    description:
-      "Connect with vetted Las Vegas professionals who specialize in the project you have in mind.",
+    title: "Connect",
+    description: "Find professionals who fit.",
   },
 ] as const;
 
-export default function Home() {
+export default async function Home() {
+  const categories = await listCategories();
+  const [categoriesWithImage, featuredProjects, featuredBusinesses, guides] =
+    await Promise.all([
+      listCategoriesWithSampleImage(categories),
+      listFeaturedProjects(8),
+      listFeaturedBusinesses(4),
+      listGuides(3),
+    ]);
+
   return (
     <>
+      {/* Hero */}
       <section className="border-border bg-secondary/40 border-b">
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 md:py-24 lg:px-8">
           <div>
@@ -34,11 +54,11 @@ export default function Home() {
               Las Vegas, Nevada
             </p>
             <h1 className="font-display text-foreground mt-3 text-4xl leading-tight sm:text-5xl lg:text-6xl">
-              Your backyard, reimagined.
+              Your Backyard Starts Here.
             </h1>
             <p className="text-muted-foreground mt-5 max-w-md text-lg">
-              Discover what you want. Plan what you want. Find someone who can
-              build it. Yardola is where backyard projects begin.
+              Explore real backyard projects, discover local professionals, and
+              turn your ideas into a plan.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
@@ -54,33 +74,80 @@ export default function Home() {
                 nativeButton={false}
                 render={<Link href="/projects" />}
               >
-                Browse Projects
+                Explore Projects
               </Button>
             </div>
           </div>
           <div
             aria-hidden="true"
-            className="border-border bg-warm-sand/60 aspect-4/3 rounded-lg border"
+            className="border-border bg-warm-sand/60 aspect-[4/3] rounded-lg border"
           />
         </div>
       </section>
 
+      {/* What are you dreaming up? */}
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+        <div className="max-w-2xl">
+          <h2 className="font-display text-foreground text-3xl sm:text-4xl">
+            What are you dreaming up?
+          </h2>
+          <p className="text-muted-foreground mt-3">
+            Start with a category to see real backyard transformations.
+          </p>
+        </div>
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          {categoriesWithImage.map((category) => (
+            <CategoryCard key={category.id} category={category} />
+          ))}
+        </div>
+      </section>
+
+      {/* Real projects. Real inspiration. */}
+      {featuredProjects.length > 0 && (
+        <section className="border-border bg-secondary/20 border-t">
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="max-w-2xl">
+                <h2 className="font-display text-foreground text-3xl sm:text-4xl">
+                  Real projects. Real inspiration.
+                </h2>
+                <p className="text-muted-foreground mt-3">
+                  A closer look at backyards Yardola professionals have brought
+                  to life.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                nativeButton={false}
+                render={<Link href="/projects" />}
+              >
+                Browse all projects
+              </Button>
+            </div>
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {featuredProjects.map((project) => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* How Yardola works */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
         <div className="max-w-2xl">
           <h2 className="font-display text-foreground text-3xl sm:text-4xl">
             How Yardola works
           </h2>
-          <p className="text-muted-foreground mt-3">
-            A simple path from inspiration to a finished backyard project.
-          </p>
         </div>
-
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
           {STEPS.map((step) => (
-            <Card key={step.title}>
+            <Card key={step.number}>
               <CardContent>
-                <step.icon className="text-primary size-6" aria-hidden="true" />
-                <h3 className="font-display text-foreground mt-4 text-xl">
+                <span className="font-display text-primary text-sm">
+                  {step.number}
+                </span>
+                <h3 className="font-display text-foreground mt-2 text-xl">
                   {step.title}
                 </h3>
                 <p className="text-muted-foreground mt-2 text-sm">
@@ -89,6 +156,105 @@ export default function Home() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </section>
+
+      {/* Meet the people behind the projects */}
+      {featuredBusinesses.length > 0 && (
+        <section className="border-border bg-secondary/20 border-t">
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="max-w-2xl">
+                <h2 className="font-display text-foreground text-3xl sm:text-4xl">
+                  Meet the people behind the projects.
+                </h2>
+                <p className="text-muted-foreground mt-3">
+                  Las Vegas professionals building the backyards on Yardola.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                nativeButton={false}
+                render={<Link href="/professionals" />}
+              >
+                Browse all professionals
+              </Button>
+            </div>
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {featuredBusinesses.map((business) => (
+                <BusinessCard key={business.id} business={business} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Yardola Guide */}
+      {guides.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-2xl">
+              <h2 className="font-display text-foreground text-3xl sm:text-4xl">
+                Yardola Guide
+              </h2>
+              <p className="text-muted-foreground mt-3">
+                Ideas and advice for planning a backyard project in Las Vegas.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={<Link href="/guides" />}
+            >
+              All guides
+            </Button>
+          </div>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {guides.map((guide) => (
+              <Link
+                key={guide.id}
+                href={`/guides/${guide.slug}`}
+                className="group border-border bg-card hover:border-primary/40 focus-visible:ring-ring block overflow-hidden rounded-lg border transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              >
+                {guide.categoryName && (
+                  <div className="p-4 pb-0">
+                    <span className="text-primary text-xs font-medium tracking-wide uppercase">
+                      {guide.categoryName}
+                    </span>
+                  </div>
+                )}
+                <div className="p-4">
+                  <h3 className="font-display text-foreground text-lg">
+                    {guide.title}
+                  </h3>
+                  {guide.excerpt && (
+                    <p className="text-muted-foreground mt-2 line-clamp-2 text-sm">
+                      {guide.excerpt}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Final planner CTA */}
+      <section className="border-border bg-primary border-t">
+        <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 md:py-24 lg:px-8">
+          <h2 className="font-display text-primary-foreground text-3xl sm:text-4xl">
+            Have an idea? Let&apos;s turn it into a plan.
+          </h2>
+          <div className="mt-8">
+            <Button
+              size="lg"
+              variant="secondary"
+              nativeButton={false}
+              render={<Link href="/plan" />}
+            >
+              Plan My Project
+            </Button>
+          </div>
         </div>
       </section>
     </>

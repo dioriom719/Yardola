@@ -380,7 +380,7 @@ join public.features f on f.slug = v.feature_slug;
 -- Project photos: one hero + two gallery photos per project (placeholder images).
 insert into public.project_photos (project_id, url, alt_text, photo_type, sort_order)
 select p.id,
-       'https://placehold.co/1200x900?text=' || replace(v.suffix, ' ', '+'),
+       'https://placehold.co/1200x900.png?text=' || replace(v.suffix, ' ', '+'),
        p.title || ' -- ' || v.suffix,
        v.photo_type::public.photo_type,
        v.sort_order
