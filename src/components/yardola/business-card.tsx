@@ -73,7 +73,7 @@ export function BusinessCard({ business }: BusinessCardProps) {
           )}
           <p className="text-muted-foreground mt-1 text-xs">
             {business.projectCount}{" "}
-            {business.projectCount === 1 ? "project" : "projects"} on Yardola
+            {business.projectCount === 1 ? "project" : "projects"} on YARDOLO
           </p>
           {business.categoryNames.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">

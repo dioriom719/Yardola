@@ -24,7 +24,7 @@ export async function generateMetadata(
   ]);
 
   if (!category || !city)
-    return { title: "Yardola", robots: { index: false, follow: true } };
+    return { title: "YARDOLO", robots: { index: false, follow: true } };
 
   const [{ index }, projectCount, businessCount] = await Promise.all([
     getCategoryLocationIndexability(category, city),

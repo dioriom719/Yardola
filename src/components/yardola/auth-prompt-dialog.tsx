@@ -31,7 +31,7 @@ export function AuthPromptDialog({
         <DialogHeader>
           <DialogTitle>Save this project to your inspiration board</DialogTitle>
           <DialogDescription>
-            Create a free Yardola account or sign in to save projects and start
+            Create a free YARDOLO account or sign in to save projects and start
             building your plan.
           </DialogDescription>
         </DialogHeader>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { YardoloLogo } from "@/components/yardola/logo";
 
 const EXPLORE_LINKS = [
   { href: "/projects", label: "Projects" },
@@ -8,7 +9,7 @@ const EXPLORE_LINKS = [
 ] as const;
 
 const COMPANY_LINKS = [
-  { href: "/about", label: "About Yardola" },
+  { href: "/about", label: "About YARDOLO" },
   { href: "/for-professionals", label: "For Professionals" },
   { href: "/contact", label: "Contact" },
 ] as const;
@@ -24,8 +25,8 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="font-display text-primary text-xl">
-              Yardola
+            <Link href="/" aria-label="YARDOLO -- Home">
+              <YardoloLogo variant="stacked" className="-ml-2 h-28" />
             </Link>
             <p className="text-muted-foreground mt-3 max-w-xs text-sm">
               Discover what you want. Plan what you want. Find someone who can
@@ -40,7 +41,7 @@ export function Footer() {
 
         <div className="border-border mt-12 flex flex-col items-start justify-between gap-4 border-t pt-6 sm:flex-row sm:items-center">
           <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} Yardola. All rights reserved.
+            &copy; {new Date().getFullYear()} YARDOLO. All rights reserved.
           </p>
           <p className="text-muted-foreground text-sm">Las Vegas, Nevada</p>
         </div>

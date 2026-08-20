@@ -7,8 +7,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import type { BudgetRange, ProjectTimeline } from "@/types";
 
 export const metadata = buildMetadata({
-  title: "Lead Inbox | Yardola",
-  description: "Review project leads matched to your Yardola business.",
+  title: "Lead Inbox | YARDOLO",
+  description: "Review project leads matched to your YARDOLO business.",
   path: "/business/leads",
   index: false,
 });
@@ -26,7 +26,7 @@ export default async function BusinessLeadsPage() {
           Professional leads
         </h1>
         <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-          Projects are routed here when Yardola finds a strong match between a
+          Projects are routed here when YARDOLO finds a strong match between a
           homeowner&apos;s plan, your services, and your service area.
         </p>
       </div>
@@ -93,7 +93,7 @@ export default async function BusinessLeadsPage() {
                     Homeowner
                   </p>
                   <p className="mt-1 text-sm font-medium">
-                    {lead.homeownerName || "Yardola homeowner"}
+                    {lead.homeownerName || "YARDOLO homeowner"}
                   </p>
                 </div>
               </div>

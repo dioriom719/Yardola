@@ -22,7 +22,7 @@ import { getPlanDetail } from "@/lib/data/plans";
 import { getLeadForPlan } from "@/lib/data/leads";
 
 export const metadata = buildMetadata({
-  title: "Project Plan | Yardola",
+  title: "Project Plan | YARDOLO",
   description: "View and manage your backyard project plan.",
   path: "/account/plans",
   index: false,
@@ -66,7 +66,7 @@ export default async function PlanDetailPage(
       <SeoBreadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "My Yardola", href: "/account" },
+          { label: "My YARDOLO", href: "/account" },
           { label: "My Plans", href: "/account/plans" },
           { label: displayTitle },
         ]}
@@ -179,7 +179,7 @@ export default async function PlanDetailPage(
                 </h2>
                 <p className="text-muted-foreground mt-1 text-sm">
                   We matched your project with {lead.matches.length} active
-                  Yardola professionals.
+                  YARDOLO professionals.
                 </p>
               </div>
               <Badge>
@@ -230,7 +230,7 @@ export default async function PlanDetailPage(
               Ready to find a professional?
             </h2>
             <p className="text-muted-foreground mx-auto mt-2 max-w-xl text-sm">
-              Yardola will compare your project type and location with active
+              YARDOLO will compare your project type and location with active
               professionals who offer the right services, then send your project
               to the best matches.
             </p>

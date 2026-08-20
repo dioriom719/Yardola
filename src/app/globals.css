@@ -5,17 +5,17 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Yardola design tokens.
- * Brand palette: Primary Green, Deep Forest, Warm Sand, Cream, White,
- * Charcoal, Muted, Border. Photography (not color) carries most of the
- * visual interest -- keep green usage restrained.
+ * YARDOLO design tokens.
+ * Approved brand palette: Evergreen, Terracotta, Sand, Sage, Charcoal,
+ * Ivory. Photography (not color) carries most of the visual interest --
+ * keep green usage restrained.
  */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-dm-serif-display);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-manrope);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-display);
 
@@ -49,11 +49,13 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* Raw Yardola brand colors, available as e.g. bg-yardola-green, text-deep-forest */
-  --color-yardola-green: var(--yardola-green);
-  --color-deep-forest: var(--deep-forest);
-  --color-warm-sand: var(--warm-sand);
-  --color-cream: var(--cream);
+  /* Raw YARDOLO brand colors, available as e.g. bg-evergreen, text-terracotta */
+  --color-evergreen: var(--evergreen);
+  --color-evergreen-deep: var(--evergreen-deep);
+  --color-terracotta: var(--terracotta);
+  --color-sand: var(--sand);
+  --color-sage: var(--sage);
+  --color-ivory: var(--ivory);
   --color-charcoal: var(--charcoal);
 
   --radius-sm: calc(var(--radius) * 0.6);
@@ -66,80 +68,85 @@
 }
 
 :root {
-  /* Brand palette */
-  --yardola-green: #315c4c;
-  --deep-forest: #1f3931;
-  --warm-sand: #e9e0d2;
-  --cream: #f8f6f1;
-  --charcoal: #252827;
+  /* Approved brand palette (source of truth: YARDOLO brand guide) */
+  --evergreen: #173b35;
+  /* Computed deeper shade of Evergreen, not a separate brand color --
+     used only where the design needs more depth than Evergreen itself
+     (dark-mode background, chart contrast). */
+  --evergreen-deep: #102925;
+  --terracotta: #c87555;
+  --sand: #e7ded0;
+  --sage: #8a9a87;
+  --ivory: #faf9f5;
+  --charcoal: #202624;
 
-  --background: var(--cream);
+  --background: var(--ivory);
   --foreground: var(--charcoal);
   --card: #ffffff;
   --card-foreground: var(--charcoal);
   --popover: #ffffff;
   --popover-foreground: var(--charcoal);
-  --primary: var(--yardola-green);
-  --primary-foreground: var(--cream);
-  --secondary: var(--warm-sand);
-  --secondary-foreground: var(--deep-forest);
+  --primary: var(--evergreen);
+  --primary-foreground: var(--ivory);
+  --secondary: var(--sand);
+  --secondary-foreground: var(--evergreen-deep);
   --muted: #f1ece3;
   --muted-foreground: #6f7471;
-  --accent: var(--warm-sand);
-  --accent-foreground: var(--deep-forest);
+  --accent: var(--sand);
+  --accent-foreground: var(--evergreen-deep);
   --destructive: oklch(0.577 0.245 27.325);
   --border: #e2e0da;
   --input: #e2e0da;
-  --ring: color-mix(in oklch, var(--yardola-green), transparent 50%);
-  --chart-1: var(--yardola-green);
-  --chart-2: var(--deep-forest);
-  --chart-3: #b8a888;
+  --ring: color-mix(in oklch, var(--evergreen), transparent 50%);
+  --chart-1: var(--evergreen);
+  --chart-2: var(--terracotta);
+  --chart-3: var(--sage);
   --chart-4: #6f7471;
-  --chart-5: var(--warm-sand);
+  --chart-5: var(--sand);
   /* Restrained radii -- editorial, not "SaaS bubbly" */
   --radius: 0.4rem;
   --sidebar: #ffffff;
   --sidebar-foreground: var(--charcoal);
-  --sidebar-primary: var(--yardola-green);
-  --sidebar-primary-foreground: var(--cream);
-  --sidebar-accent: var(--warm-sand);
-  --sidebar-accent-foreground: var(--deep-forest);
+  --sidebar-primary: var(--evergreen);
+  --sidebar-primary-foreground: var(--ivory);
+  --sidebar-accent: var(--sand);
+  --sidebar-accent-foreground: var(--evergreen-deep);
   --sidebar-border: #e2e0da;
-  --sidebar-ring: var(--yardola-green);
+  --sidebar-ring: var(--evergreen);
 }
 
 .dark {
-  --background: var(--deep-forest);
-  --foreground: var(--cream);
-  --card: #26433a;
-  --card-foreground: var(--cream);
-  --popover: #26433a;
-  --popover-foreground: var(--cream);
-  --primary: var(--warm-sand);
-  --primary-foreground: var(--deep-forest);
-  --secondary: #2d4c42;
-  --secondary-foreground: var(--cream);
-  --muted: #2d4c42;
+  --background: var(--evergreen-deep);
+  --foreground: var(--ivory);
+  --card: #1c4139;
+  --card-foreground: var(--ivory);
+  --popover: #1c4139;
+  --popover-foreground: var(--ivory);
+  --primary: var(--sand);
+  --primary-foreground: var(--evergreen-deep);
+  --secondary: #26493f;
+  --secondary-foreground: var(--ivory);
+  --muted: #26493f;
   --muted-foreground: #a9b3ac;
-  --accent: #2d4c42;
-  --accent-foreground: var(--cream);
+  --accent: #26493f;
+  --accent-foreground: var(--ivory);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: color-mix(in oklch, var(--cream), transparent 85%);
-  --input: color-mix(in oklch, var(--cream), transparent 80%);
-  --ring: color-mix(in oklch, var(--warm-sand), transparent 40%);
-  --chart-1: var(--warm-sand);
-  --chart-2: var(--cream);
-  --chart-3: #b8a888;
+  --border: color-mix(in oklch, var(--ivory), transparent 85%);
+  --input: color-mix(in oklch, var(--ivory), transparent 80%);
+  --ring: color-mix(in oklch, var(--sand), transparent 40%);
+  --chart-1: var(--sand);
+  --chart-2: var(--terracotta);
+  --chart-3: var(--sage);
   --chart-4: #a9b3ac;
-  --chart-5: #2d4c42;
-  --sidebar: #26433a;
-  --sidebar-foreground: var(--cream);
-  --sidebar-primary: var(--warm-sand);
-  --sidebar-primary-foreground: var(--deep-forest);
-  --sidebar-accent: #2d4c42;
-  --sidebar-accent-foreground: var(--cream);
-  --sidebar-border: color-mix(in oklch, var(--cream), transparent 85%);
-  --sidebar-ring: var(--warm-sand);
+  --chart-5: #26493f;
+  --sidebar: #1c4139;
+  --sidebar-foreground: var(--ivory);
+  --sidebar-primary: var(--sand);
+  --sidebar-primary-foreground: var(--evergreen-deep);
+  --sidebar-accent: #26493f;
+  --sidebar-accent-foreground: var(--ivory);
+  --sidebar-border: color-mix(in oklch, var(--ivory), transparent 85%);
+  --sidebar-ring: var(--sand);
 }
 
 @layer base {
@@ -156,6 +163,6 @@
   h2,
   h3,
   h4 {
-    @apply font-display;
+    @apply font-display font-bold;
   }
 }

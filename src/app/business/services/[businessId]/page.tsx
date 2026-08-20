@@ -7,8 +7,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = buildMetadata({
-  title: "Services & Areas | Yardola",
-  description: "Manage your Yardola services and service areas.",
+  title: "Services & Areas | YARDOLO",
+  description: "Manage your YARDOLO services and service areas.",
   path: "/business/services",
   index: false,
 });

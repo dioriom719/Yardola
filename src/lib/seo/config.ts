@@ -7,11 +7,11 @@ import { env } from "@/lib/env";
  */
 
 export const SITE_URL = env.siteUrl.replace(/\/+$/, "");
-export const SITE_NAME = "Yardola";
+export const SITE_NAME = "YARDOLO";
 export const SITE_TAGLINE = "Your Backyard Starts Here.";
 export const DEFAULT_TITLE = `${SITE_NAME} | Backyard Projects & Inspiration in Las Vegas`;
 export const DEFAULT_DESCRIPTION =
-  "Explore real backyard projects, discover local professionals, and turn your ideas into a plan. Yardola is Las Vegas's visual backyard-project marketplace.";
+  "Explore real backyard projects, discover local professionals, and turn your ideas into a plan. YARDOLO is Las Vegas's visual backyard-project marketplace.";
 export const DEFAULT_OG_IMAGE_ALT = `${SITE_NAME} -- backyard project inspiration in Las Vegas`;
 export const TWITTER_HANDLE = undefined as string | undefined;
 

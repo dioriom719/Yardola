@@ -16,25 +16,25 @@ export default async function Image() {
         flexDirection: "column",
         alignItems: "flex-start",
         justifyContent: "center",
-        backgroundColor: "#F8F6F1",
+        backgroundColor: "#FAF9F5",
         padding: "80px",
       }}
     >
       <div
         style={{
           fontSize: 88,
-          color: "#315C4C",
+          color: "#173B35",
           fontWeight: 700,
           letterSpacing: "-0.02em",
         }}
       >
-        Yardola
+        YARDOLO
       </div>
       <div
         style={{
           marginTop: 24,
           fontSize: 36,
-          color: "#252827",
+          color: "#202624",
         }}
       >
         {SITE_TAGLINE}

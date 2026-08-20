@@ -14,7 +14,7 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { listPlans } from "@/lib/data/plans";
 
 export const metadata = buildMetadata({
-  title: "My Plans | Yardola",
+  title: "My Plans | YARDOLO",
   description: "Your backyard project plans.",
   path: "/account/plans",
   index: false,
@@ -34,7 +34,7 @@ export default async function PlansPage(props: PageProps<"/account/plans">) {
       <SeoBreadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "My Yardola", href: "/account" },
+          { label: "My YARDOLO", href: "/account" },
           { label: "My Plans" },
         ]}
       />

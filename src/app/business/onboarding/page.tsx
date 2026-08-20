@@ -5,8 +5,8 @@ import { createBusiness } from "@/app/actions/business";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildMetadata({
-  title: "Add Your Business | Yardola",
-  description: "Create a Yardola professional listing.",
+  title: "Add Your Business | YARDOLO",
+  description: "Create a YARDOLO professional listing.",
   path: "/business/onboarding",
   index: false,
 });

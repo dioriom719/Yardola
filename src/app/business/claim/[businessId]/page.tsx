@@ -7,8 +7,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = buildMetadata({
-  title: "Claim Business | Yardola",
-  description: "Request ownership of a Yardola business listing.",
+  title: "Claim Business | YARDOLO",
+  description: "Request ownership of a YARDOLO business listing.",
   path: "/business/claim",
   index: false,
 });
@@ -43,7 +43,7 @@ export default async function ClaimBusinessDetailPage({
         <p className="text-muted-foreground mt-2 text-sm">
           {business.city && business.state
             ? `${business.city}, ${business.state}`
-            : "Yardola listing"}
+            : "YARDOLO listing"}
         </p>
         {business.description && (
           <p className="text-muted-foreground mt-5 text-sm">

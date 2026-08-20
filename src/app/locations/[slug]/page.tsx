@@ -29,7 +29,7 @@ export async function generateMetadata(
 
   const city = await getCityBySlug(slug);
   if (!city)
-    return { title: "Yardola", robots: { index: false, follow: true } };
+    return { title: "YARDOLO", robots: { index: false, follow: true } };
 
   const { index } = await getLocationIndexability(city);
   // Only the first page of a paginated hub is treated as canonical/indexable.

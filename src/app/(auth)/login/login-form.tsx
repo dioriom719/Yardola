@@ -63,7 +63,7 @@ export function LoginForm({ next }: { next: string }) {
       </Button>
 
       <p className="text-muted-foreground text-center text-sm">
-        New to Yardola?{" "}
+        New to YARDOLO?{" "}
         <Link
           href={`/signup?next=${encodeURIComponent(next)}`}
           className="text-primary font-medium hover:underline"

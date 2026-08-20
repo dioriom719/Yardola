@@ -7,7 +7,7 @@ import { listGuides } from "@/lib/data/guides";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildMetadata({
-  title: "Yardola Guide | Backyard Project Advice",
+  title: "YARDOLO Guide | Backyard Project Advice",
   description:
     "Ideas, advice, and planning tips for backyard projects in Las Vegas -- from budgeting to choosing a style.",
   path: "/guides",
@@ -25,7 +25,7 @@ export default async function GuidesPage() {
 
       <div className="mt-4 max-w-2xl">
         <h1 className="font-display text-foreground text-3xl sm:text-4xl">
-          Yardola Guide
+          YARDOLO Guide
         </h1>
         <p className="text-muted-foreground mt-3">
           Ideas, advice, and planning tips for backyard projects in Las Vegas.

@@ -47,7 +47,7 @@ export async function generateMetadata(
     );
   }
 
-  return { title: "Yardola", robots: { index: false, follow: true } };
+  return { title: "YARDOLO", robots: { index: false, follow: true } };
 }
 
 export default async function ProjectOrCategoryPage(

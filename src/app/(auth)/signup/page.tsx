@@ -2,9 +2,9 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { SignupForm } from "./signup-form";
 
 export const metadata = buildMetadata({
-  title: "Create Account | Yardola",
+  title: "Create Account | YARDOLO",
   description:
-    "Create a free Yardola account to save inspiration and plan your project.",
+    "Create a free YARDOLO account to save inspiration and plan your project.",
   path: "/signup",
   index: false,
 });

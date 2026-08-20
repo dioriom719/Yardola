@@ -7,7 +7,7 @@ import { countSavedProjects } from "@/lib/data/saved-projects";
 import { countPlans } from "@/lib/data/plans";
 
 export const metadata = buildMetadata({
-  title: "My Yardola | Yardola",
+  title: "My YARDOLO | YARDOLO",
   description: "Your saved inspiration and project plans.",
   path: "/account",
   index: false,
@@ -24,7 +24,7 @@ export default async function AccountDashboardPage() {
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <div>
         <p className="text-primary text-xs font-medium tracking-wide uppercase">
-          My Yardola
+          My YARDOLO
         </p>
         <h1 className="font-display text-foreground mt-1 text-3xl sm:text-4xl">
           {profile?.firstName

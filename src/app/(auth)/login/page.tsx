@@ -2,8 +2,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { LoginForm } from "./login-form";
 
 export const metadata = buildMetadata({
-  title: "Sign In | Yardola",
-  description: "Sign in to your Yardola account.",
+  title: "Sign In | YARDOLO",
+  description: "Sign in to your YARDOLO account.",
   path: "/login",
   index: false,
 });

@@ -13,7 +13,7 @@ import {
 import { paramInt } from "@/lib/search-params";
 
 export const metadata = buildMetadata({
-  title: "Saved Projects | Yardola",
+  title: "Saved Projects | YARDOLO",
   description: "Backyard projects you've saved for inspiration.",
   path: "/account/saved",
   index: false,
@@ -31,7 +31,7 @@ export default async function SavedProjectsPage(
       <SeoBreadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "My Yardola", href: "/account" },
+          { label: "My YARDOLO", href: "/account" },
           { label: "Saved Projects" },
         ]}
       />

@@ -2,8 +2,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { ResetPasswordForm } from "./reset-password-form";
 
 export const metadata = buildMetadata({
-  title: "Set New Password | Yardola",
-  description: "Set a new password for your Yardola account.",
+  title: "Set New Password | YARDOLO",
+  description: "Set a new password for your YARDOLO account.",
   path: "/reset-password",
   index: false,
 });

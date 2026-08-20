@@ -22,7 +22,7 @@ export async function generateMetadata(
   const { slug } = await props.params;
   const business = await getBusinessBySlug(slug);
   if (!business)
-    return { title: "Yardola", robots: { index: false, follow: true } };
+    return { title: "YARDOLO", robots: { index: false, follow: true } };
   return generateBusinessMetadata(
     business,
     getBusinessIndexability(business).index

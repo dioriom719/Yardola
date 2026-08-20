@@ -5,8 +5,8 @@ import { getCurrentProfile } from "@/lib/data/profile";
 import { SettingsForm } from "./settings-form";
 
 export const metadata = buildMetadata({
-  title: "Account Settings | Yardola",
-  description: "Manage your Yardola account details.",
+  title: "Account Settings | YARDOLO",
+  description: "Manage your YARDOLO account details.",
   path: "/account/settings",
   index: false,
 });
@@ -20,7 +20,7 @@ export default async function AccountSettingsPage() {
       <SeoBreadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "My Yardola", href: "/account" },
+          { label: "My YARDOLO", href: "/account" },
           { label: "Settings" },
         ]}
       />

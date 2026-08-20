@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Page Not Found | Yardola",
+  title: "Page Not Found | YARDOLO",
   robots: { index: false, follow: true },
 };
 

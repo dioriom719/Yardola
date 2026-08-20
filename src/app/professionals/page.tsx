@@ -14,9 +14,9 @@ import { paramInt, paramString } from "@/lib/search-params";
 import { buildMetadata } from "@/lib/seo/metadata";
 import type { Metadata } from "next";
 
-const TITLE = "Backyard Professionals in Las Vegas | Yardola";
+const TITLE = "Backyard Professionals in Las Vegas | YARDOLO";
 const DESCRIPTION =
-  "Portfolios from the businesses building Las Vegas backyards on Yardola -- browse by category or location.";
+  "Portfolios from the businesses building Las Vegas backyards on YARDOLO -- browse by category or location.";
 
 /**
  * `/professionals` itself (no filters) is a legitimate indexable
@@ -85,7 +85,7 @@ export default async function ProfessionalsPage(
         </h1>
         <p className="text-muted-foreground mt-3">
           Portfolios from the businesses building Las Vegas backyards on
-          Yardola.
+          YARDOLO.
         </p>
       </div>
 

@@ -1,5 +1,5 @@
 /**
- * Shared domain types for Yardola, matching the schema established in
+ * Shared domain types for YARDOLO, matching the schema established in
  * supabase/migrations/. These are hand-written to match the exact columns
  * each data-access function selects (see src/lib/data/) -- not a full
  * generated Database type.

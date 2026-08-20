@@ -24,8 +24,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = buildMetadata({
-  title: "Billing | Yardola",
-  description: "Manage your Yardola business subscription and billing.",
+  title: "Billing | YARDOLO",
+  description: "Manage your YARDOLO business subscription and billing.",
   path: "/business/billing",
   index: false,
 });
@@ -88,7 +88,7 @@ export default async function BusinessBillingPage({
       <div className="mt-6">
         <h1 className="font-display text-3xl">Billing</h1>
         <p className="text-muted-foreground mt-2 text-sm">
-          Manage {business.name}&apos;s Yardola subscription.
+          Manage {business.name}&apos;s YARDOLO subscription.
         </p>
       </div>
 

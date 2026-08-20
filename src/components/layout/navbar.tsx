@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AccountMenu } from "@/components/layout/account-menu";
+import { YardoloLogo } from "@/components/yardola/logo";
 import { createClient } from "@/lib/supabase/server";
 
 const NAV_LINKS = [
@@ -25,9 +26,10 @@ export async function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="font-display text-primary focus-visible:ring-ring text-xl focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          aria-label="YARDOLO -- Home"
+          className="focus-visible:ring-ring rounded-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
-          Yardola
+          <YardoloLogo showTagline={false} className="h-8" />
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">

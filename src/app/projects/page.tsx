@@ -17,7 +17,7 @@ import { SearchX } from "lucide-react";
 import type { Metadata } from "next";
 import type { BudgetRange } from "@/types/enums";
 
-const TITLE = "Explore Backyard Projects | Yardola";
+const TITLE = "Explore Backyard Projects | YARDOLO";
 const DESCRIPTION =
   "Browse real backyard transformations from Las Vegas professionals across every category and location.";
 

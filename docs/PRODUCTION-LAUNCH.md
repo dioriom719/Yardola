@@ -1,4 +1,4 @@
-# Yardola Production Launch Checklist
+# YARDOLO Production Launch Checklist
 
 This is the practical launch checklist produced by the Phase 10
 production-readiness audit. It distinguishes what's already done in code

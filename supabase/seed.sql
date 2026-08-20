@@ -1,5 +1,5 @@
 -- ============================================================================
--- YARDOLA DEVELOPMENT SEED DATA -- NOT PRODUCTION DATA
+-- YARDOLO DEVELOPMENT SEED DATA -- NOT PRODUCTION DATA
 --
 -- This file populates a local/dev database with representative catalog
 -- data (locations, categories, services, businesses, projects, guides)
@@ -387,9 +387,9 @@ select p.id,
 from public.projects p
 join lateral (
   values
-    ('Yardola+Seed+Photo+1', 'hero', 0),
-    ('Yardola+Seed+Photo+2', 'gallery', 1),
-    ('Yardola+Seed+Photo+3', 'gallery', 2)
+    ('Yardolo+Seed+Photo+1', 'hero', 0),
+    ('Yardolo+Seed+Photo+2', 'gallery', 1),
+    ('Yardolo+Seed+Photo+3', 'gallery', 2)
 ) as v(suffix, photo_type, sort_order) on true;
 
 -- ----------------------------------------------------------------------------

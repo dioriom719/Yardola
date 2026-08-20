@@ -7,7 +7,7 @@ import { getPlanDetail } from "@/lib/data/plans";
 import { PlannerWizard } from "./_components/planner-wizard";
 
 export const metadata = buildMetadata({
-  title: "Plan My Project | Yardola",
+  title: "Plan My Project | YARDOLO",
   description: "Shape your backyard project idea into a plan, step by step.",
   path: "/plan",
   index: false,

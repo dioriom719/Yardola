@@ -9,8 +9,8 @@ import {
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildMetadata({
-  title: "Professional Dashboard | Yardola",
-  description: "Manage your Yardola business profile and homeowner leads.",
+  title: "Professional Dashboard | YARDOLO",
+  description: "Manage your YARDOLO business profile and homeowner leads.",
   path: "/business",
   index: false,
 });
@@ -34,7 +34,7 @@ export default async function BusinessDashboardPage() {
             Professional dashboard
           </h1>
           <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-            Manage your Yardola presence and the homeowner projects matched to
+            Manage your YARDOLO presence and the homeowner projects matched to
             your business.
           </p>
         </div>
@@ -138,10 +138,10 @@ export default async function BusinessDashboardPage() {
       ) : (
         <section className="border-border bg-secondary/20 mt-10 rounded-xl border p-8">
           <h2 className="font-display text-2xl">
-            Get your business on Yardola
+            Get your business on YARDOLO
           </h2>
           <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-            Create a professional listing or claim an existing Yardola business
+            Create a professional listing or claim an existing YARDOLO business
             so you can keep your information current and receive matched
             homeowner projects.
           </p>

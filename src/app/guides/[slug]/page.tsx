@@ -20,7 +20,7 @@ export async function generateMetadata(
   const { slug } = await props.params;
   const guide = await getGuideBySlug(slug);
   if (!guide)
-    return { title: "Yardola", robots: { index: false, follow: true } };
+    return { title: "YARDOLO", robots: { index: false, follow: true } };
   return generateGuideMetadata(guide, getGuideIndexability(guide).index);
 }
 

@@ -19,7 +19,7 @@ export function AccountMenu() {
         render={
           <Button variant="ghost" className="gap-1.5">
             <User />
-            My Yardola
+            My YARDOLO
           </Button>
         }
       />

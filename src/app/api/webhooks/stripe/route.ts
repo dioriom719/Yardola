@@ -6,7 +6,7 @@ import { env } from "@/lib/env";
 
 /**
  * Stripe webhook endpoint. The database becomes the source of truth for
- * Yardola subscription state only after events processed here -- nothing
+ * YARDOLO subscription state only after events processed here -- nothing
  * else writes to `subscriptions`/`transactions`/`business_billing`'s
  * Stripe-derived columns.
  *
@@ -41,7 +41,7 @@ const KNOWN_STATUSES: ReadonlySet<string> = new Set(
 
 /**
  * Stripe's `paused` and `unpaid` statuses (and any future status Stripe
- * adds) have no direct Yardola equivalent -- the subscription_status enum
+ * adds) have no direct YARDOLO equivalent -- the subscription_status enum
  * is intentionally kept minimal per the migration -- so they map to
  * `past_due`, the closest "payment isn't current, but not yet terminal"
  * state.

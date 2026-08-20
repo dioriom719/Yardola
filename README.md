@@ -1,6 +1,6 @@
-# Yardola
+# YARDOLO
 
-Yardola is a visual backyard-project marketplace connecting homeowners with
+YARDOLO is a visual backyard-project marketplace connecting homeowners with
 backyard-project inspiration, project planning, and local professionals.
 Initial market: Las Vegas, Nevada.
 

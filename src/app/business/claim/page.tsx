@@ -6,8 +6,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = buildMetadata({
-  title: "Claim Your Business | Yardola",
-  description: "Find and claim your Yardola business listing.",
+  title: "Claim Your Business | YARDOLO",
+  description: "Find and claim your YARDOLO business listing.",
   path: "/business/claim",
   index: false,
 });
@@ -37,7 +37,7 @@ export default async function ClaimBusinessPage() {
           Claim your business
         </h1>
         <p className="text-muted-foreground mt-2 text-sm">
-          Choose an unclaimed Yardola listing. Claim requests are reviewed
+          Choose an unclaimed YARDOLO listing. Claim requests are reviewed
           before ownership is transferred.
         </p>
       </div>

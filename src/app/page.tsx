@@ -87,7 +87,7 @@ export default async function Home() {
           </div>
           <div
             aria-hidden="true"
-            className="border-border bg-warm-sand/60 aspect-[4/3] rounded-lg border"
+            className="border-border bg-sand/60 aspect-[4/3] rounded-lg border"
           />
         </div>
       </section>
@@ -119,7 +119,7 @@ export default async function Home() {
                   Real projects. Real inspiration.
                 </h2>
                 <p className="text-muted-foreground mt-3">
-                  A closer look at backyards Yardola professionals have brought
+                  A closer look at backyards YARDOLO professionals have brought
                   to life.
                 </p>
               </div>
@@ -144,11 +144,11 @@ export default async function Home() {
         </section>
       )}
 
-      {/* How Yardola works */}
+      {/* How YARDOLO works */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
         <div className="max-w-2xl">
           <h2 className="font-display text-foreground text-3xl sm:text-4xl">
-            How Yardola works
+            How YARDOLO works
           </h2>
         </div>
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -180,7 +180,7 @@ export default async function Home() {
                   Meet the people behind the projects.
                 </h2>
                 <p className="text-muted-foreground mt-3">
-                  Las Vegas professionals building the backyards on Yardola.
+                  Las Vegas professionals building the backyards on YARDOLO.
                 </p>
               </div>
               <Button
@@ -200,13 +200,13 @@ export default async function Home() {
         </section>
       )}
 
-      {/* Yardola Guide */}
+      {/* YARDOLO Guide */}
       {guides.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
               <h2 className="font-display text-foreground text-3xl sm:text-4xl">
-                Yardola Guide
+                YARDOLO Guide
               </h2>
               <p className="text-muted-foreground mt-3">
                 Ideas and advice for planning a backyard project in Las Vegas.

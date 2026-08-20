@@ -7,8 +7,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = buildMetadata({
-  title: "Business Profile Settings | Yardola",
-  description: "Manage your Yardola business profile.",
+  title: "Business Profile Settings | YARDOLO",
+  description: "Manage your YARDOLO business profile.",
   path: "/business/settings",
   index: false,
 });
@@ -42,7 +42,7 @@ export default async function BusinessSettingsPage({
       <div className="mt-6">
         <h1 className="font-display text-3xl">Edit business profile</h1>
         <p className="text-muted-foreground mt-2 text-sm">
-          Keep your core business information accurate. Yardola uses this
+          Keep your core business information accurate. YARDOLO uses this
           information when presenting you to homeowners.
         </p>
       </div>
