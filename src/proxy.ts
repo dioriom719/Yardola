@@ -9,6 +9,11 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|opengraph-image|sitemap|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    // /api is excluded: today it's only the unauthenticated Stripe webhook
+    // (raw-body signature verification, no Supabase session involved), so
+    // running the cookie-refresh/redirect logic against it is pure waste
+    // on the hot path of a payment webhook. Revisit if a future /api route
+    // needs session-aware middleware treatment.
+    "/((?!api|_next/static|_next/image|favicon.ico|opengraph-image|sitemap|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

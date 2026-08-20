@@ -50,8 +50,15 @@ export const env = {
   get siteUrl() {
     if (process.env.NEXT_PUBLIC_SITE_URL)
       return process.env.NEXT_PUBLIC_SITE_URL;
-    return process.env.NODE_ENV === "production"
-      ? "https://yardola.com"
-      : "http://localhost:3000";
+    // In production this silently guessing a domain would misdirect auth
+    // confirmation emails, Stripe checkout/portal return URLs, and SEO
+    // canonical/OG URLs if the real domain ever differs (or the env var
+    // is simply forgotten during deploy) -- fail loudly instead. Dev/test
+    // keeps a convenient default since NEXT_PUBLIC_SITE_URL is optional
+    // in .env.example for local work.
+    if (process.env.NODE_ENV === "production") {
+      return requireEnv("NEXT_PUBLIC_SITE_URL", undefined);
+    }
+    return "http://localhost:3000";
   },
 };

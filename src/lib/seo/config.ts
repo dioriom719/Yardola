@@ -52,6 +52,7 @@ export const DISALLOWED_ROBOTS_PATHS = [
   "/api/",
   "/account",
   "/plan",
+  "/business",
   "/login",
   "/signup",
   "/forgot-password",

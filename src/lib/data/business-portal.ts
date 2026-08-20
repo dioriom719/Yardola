@@ -31,7 +31,7 @@ export async function listOwnedBusinesses(): Promise<OwnedBusiness[]> {
       city, state, status, verification_status,
       business_services(count),
       business_service_areas(count),
-      leads(count)
+      lead_matches(count)
     `
     )
     .eq("owner_id", userData.user.id)
@@ -54,7 +54,7 @@ export async function listOwnedBusinesses(): Promise<OwnedBusiness[]> {
     verificationStatus: business.verification_status,
     serviceCount: business.business_services?.[0]?.count ?? 0,
     areaCount: business.business_service_areas?.[0]?.count ?? 0,
-    leadCount: business.leads?.[0]?.count ?? 0,
+    leadCount: business.lead_matches?.[0]?.count ?? 0,
   }));
 }
 

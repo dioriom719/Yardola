@@ -7,194 +7,233 @@ Initial market: Las Vegas, Nevada.
 > **Discover what you want -> Plan what you want -> Find someone who can
 > build it.**
 
-This repository is currently through **Phase 2: Database Foundation**.
-Phase 1 established the app shell, design system, and component structure.
-Phase 2 adds the production-ready Supabase/Postgres schema, RLS policies,
-and dev seed data. No public discovery pages, authentication UI, project
-planner, lead routing, or dashboards exist yet -- see
-[What's not built yet](#whats-not-built-yet).
+This repository has completed **Phase 10: Production Launch Readiness**.
+Phases 1-9 built the product end to end: the public discovery/SEO surface,
+homeowner auth and project planner, lead matching and routing, the business
+portal, and Stripe-backed business billing. Phase 10 audited the whole
+codebase for production readiness, fixed what could safely be fixed in
+code/config/migrations, and documents what still requires real production
+credentials -- see [`docs/PRODUCTION-LAUNCH.md`](docs/PRODUCTION-LAUNCH.md)
+for the launch checklist.
 
 ## Tech stack
 
-- [Next.js](https://nextjs.org) (App Router) + TypeScript
+- [Next.js](https://nextjs.org) 16 (App Router, Turbopack) + TypeScript
 - [Tailwind CSS](https://tailwindcss.com) v4
-- [shadcn/ui](https://ui.shadcn.com)
-- [Supabase](https://supabase.com) (Postgres, with a full V1 schema + RLS -- see [Database](#database))
+- [shadcn/ui](https://ui.shadcn.com) + [Base UI](https://base-ui.com) primitives
+- [Supabase](https://supabase.com) (Postgres, RLS-first schema, Auth, Storage)
+- [Stripe](https://stripe.com) (Checkout, Customer Portal, webhooks) for business billing
 - Deployed on [Vercel](https://vercel.com)
 
-## Getting started
+## What's implemented
+
+**Public / SEO surface** -- homepage, project discovery (`/projects`,
+category and category+location pages), individual project pages,
+professional directory and profiles (`/professionals`), guides
+(`/guides`), location pages (`/locations`). Every indexable page has
+centralized metadata, Open Graph, JSON-LD structured data, breadcrumbs,
+and indexability thresholds (thin pages stay `noindex` until they have
+enough content). A split sitemap (`/sitemap/{section}.xml`) and
+`robots.txt` list/exclude exactly the intended public URLs.
+
+**Homeowner** -- signup/login/logout/password reset via Supabase Auth,
+a 9-step project planner (`/plan`) with autosave-per-step, backyard photo
+uploads to a private Supabase Storage bucket, saved projects
+(`/account/saved`), a plan list with archive/restore/delete
+(`/account/plans`), and plan submission that creates/routes a lead.
+Homeowners are never charged.
+
+**Lead matching & routing** -- submitting a plan creates a `lead` exactly
+once (idempotent resubmission) and automatically scores and routes it to
+up to 5 active businesses (`match_lead()`), weighted on category fit,
+location fit, service fit, project-type fit, and business quality. Lead
+status and `lead_events` track the lifecycle.
+
+**Business portal** -- business signup/claim workflow, a dashboard
+(`/business`), profile/services/service-area management, a lead inbox
+(`/business/leads`) scoped to the business's own matched leads, and a
+billing page (`/business/billing/[businessId]`).
+
+**Business billing (Stripe)** -- a configurable plan catalog (`plans`
+table: Basic/Featured/Premium in `supabase/seed.sql`, editable without a
+code change), Stripe Checkout for subscribing, the Stripe Customer Portal
+for payment-method/invoice management, a signature-verified idempotent
+webhook handler (`/api/webhooks/stripe`) that is the sole writer of
+subscription/transaction state, and a server-side lead-visibility
+entitlement (`max_active_leads` per plan) that falls back to the Basic
+plan's limit for businesses that haven't subscribed, so it never blocks
+existing dev/test data.
+
+## Route structure
+
+```
+/                                   Homepage
+/projects, /projects/[category], /projects/[category]/[city]
+/projects/[slug]                    Individual project
+/professionals, /professionals/[slug]
+/locations/[city]
+/guides, /guides/[slug]
+
+/login, /signup, /forgot-password, /reset-password, /auth/confirm
+
+/account, /account/settings         Homeowner dashboard (auth required)
+/account/saved                      Saved projects
+/account/plans, /account/plans/[id] Project plans
+/plan                               Planner wizard
+/plan/start                         Start-a-plan redirect helper
+
+/business                                    Dashboard (auth required)
+/business/onboarding, /business/claim[/id]   Create/claim a listing
+/business/settings/[id], /business/services/[id]
+/business/leads                              Matched lead inbox
+/business/billing/[id]                       Subscription/billing
+
+/api/webhooks/stripe                Stripe webhook endpoint (unauthenticated, signature-verified)
+/robots.txt, /sitemap/[section].xml
+```
+
+`/account`, `/plan`, and `/business` (and everything under them) require
+authentication -- enforced by `proxy.ts` (Next.js 16's renamed
+middleware) as a UX guard, with Row Level Security as the real
+authorization layer underneath. All of them, plus the auth flow itself
+and `/api/`, are excluded from `robots.txt` and carry `noindex` metadata.
+
+## Database
+
+Schema lives entirely in `supabase/migrations/*.sql`, applied in order;
+`supabase/seed.sql` provides representative dev/demo data (fictional
+businesses, projects, guides, and the pricing plan catalog -- no real
+users, plans, leads, or billing data, since those need real Supabase Auth
+users).
+
+Every table has Row Level Security enabled and a policy set following one
+recurring pattern: public tables (`categories`, `cities`, active
+`businesses`, etc.) are readable by `anon`/`authenticated`; private
+tables (`project_plans`, `leads`, `subscriptions`, `transactions`,
+`business_billing`, ...) are scoped to their owner via a
+`SECURITY DEFINER` helper function (`owns_business()`,
+`owns_project_plan()`, `lead_belongs_to_caller()`, etc., each with a
+pinned `search_path` to prevent hijacking); admins get a blanket
+`is_admin()` policy on everything. Business billing state
+(`subscriptions`, `transactions`, `business_billing`,
+`stripe_webhook_events`) has **no owner-write policy at all** -- a
+business can view its own billing state but cannot mutate it; only the
+service role (used exclusively by the Stripe webhook handler and, after
+independently re-verifying ownership, the checkout/portal server
+actions) can write it.
+
+Key tables: `profiles`, `businesses` (+ `business_profiles`,
+`business_services`, `business_service_areas`, `business_claims`),
+`projects` (+ photos/taxonomy), `project_plans` (+ categories/styles/
+features/photos/inspiration), `leads` / `lead_matches` / `lead_events`,
+`saved_projects`, `guides`, `plans` / `subscriptions` / `transactions` /
+`business_billing` / `stripe_webhook_events`.
+
+## Authentication
+
+Supabase Auth (email/password). `src/lib/supabase/{client,server,
+service}.ts` provide three clients: a browser client, a per-request
+server client (cookie-based session, RLS-respecting -- used for
+essentially everything), and a service-role client (bypasses RLS,
+server-only, used only by the Stripe webhook handler and after an
+explicit ownership check in billing server actions). `next` redirect
+parameters are validated against same-site relative paths only (never an
+attacker-supplied absolute URL) before being used in a redirect.
+
+## SEO system
+
+`src/lib/seo/` centralizes every indexability rule: `config.ts` holds
+indexability thresholds and the `robots.txt` disallow list,
+`metadata.ts` builds every page's title/description/canonical/OG/
+Twitter/robots tags through one function (`buildMetadata`),
+`structured-data.ts` emits JSON-LD, `sitemap-data.ts` / `counts.ts`
+provide the qualifying-URL queries behind `app/sitemap.ts`. Nothing else
+in the app should hand-roll metadata or hard-code a threshold number.
+
+## Local development
 
 ### Prerequisites
 
 - Node.js 20+
 - npm
-- [Docker](https://docs.docker.com/get-docker/) -- required to run Supabase locally (`supabase start`)
+- [Docker](https://docs.docker.com/get-docker/) -- required to run Supabase locally
 
-### Install dependencies
+### Setup
 
 ```bash
 npm install
-```
-
-### Configure environment variables
-
-Copy `.env.example` to `.env.local` and fill in your Supabase project
-values (from Project Settings -> API in the Supabase dashboard):
-
-```bash
-cp .env.example .env.local
-```
-
-```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
-
-The app will build and run without these set, but any code that calls the
-Supabase client utilities will throw until they're provided.
-
-### Database
-
-The schema lives entirely in versioned SQL migrations under
-`supabase/migrations/`, applied in filename (timestamp) order. Nothing
-touches a database outside of a migration -- see
-[Migrations](#migrations) below.
-
-#### Run Supabase locally
-
-```bash
-npm run db:start   # starts local Postgres + Studio + Auth via Docker
-```
-
-This prints a local `API URL`, `anon key`, and `service_role key` --
-copy the `API URL` and `anon key` into `.env.local` as
-`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Local
-Supabase Studio (a database browser/UI) is available at the printed
-Studio URL (typically http://localhost:54323).
-
-```bash
-npm run db:stop    # stops the local stack
-```
-
-#### Migrations
-
-```bash
-npm run db:migration:new <name>   # scaffold a new timestamped migration file
-npm run db:reset                  # re-applies every migration from scratch, then runs supabase/seed.sql
-```
-
-`db:reset` is destructive to your **local** database only -- it drops and
-rebuilds it from the migrations. Never run it against a production
-project. Production schema changes are applied by pushing new migration
-files through your normal deploy process (e.g. `supabase db push` against
-a linked project) -- the database itself is never edited by hand.
-
-#### Seed data
-
-`supabase/seed.sql` is dev-only fixture data (~10 businesses, ~30
-projects, categories/services/features/styles, and Las Vegas-area
-locations) -- clearly not production data (every business/project is
-fictional and photos are placeholder images). It runs automatically as
-part of `npm run db:reset`.
-
-#### Generate TypeScript types from the schema
-
-```bash
-npm run db:types   # writes src/types/database.types.ts from the local database
-```
-
-Requires the local Supabase stack to be running (`npm run db:start`).
-
-### Run the development server
-
-```bash
+cp .env.example .env.local   # fill in the values below
+npx supabase start           # starts the local Supabase stack
+npx supabase db reset        # applies every migration + seed data
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+### Environment variables
 
-### Other scripts
+See `.env.example` for the authoritative, up-to-date list. Summary:
+
+| Variable                        | Required                   | Where                 | Notes                                                                                                                                                  |
+| ------------------------------- | -------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`      | always                     | client + server       | from `supabase status` locally, or your Supabase project                                                                                               |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | always                     | client + server       | anon/public key -- safe to expose                                                                                                                      |
+| `NEXT_PUBLIC_SITE_URL`          | **required in production** | server (URL building) | optional locally (defaults to `http://localhost:3000`); in production a missing value now throws at request time instead of silently guessing a domain |
+| `SUPABASE_SERVICE_ROLE_KEY`     | always                     | server only           | bypasses RLS -- never expose to the browser                                                                                                            |
+| `STRIPE_SECRET_KEY`             | always                     | server only           | test-mode key locally, live key in production                                                                                                          |
+| `STRIPE_WEBHOOK_SECRET`         | always                     | server only           | from `stripe listen` locally, or the Stripe dashboard's webhook endpoint in production                                                                 |
+
+Server-only secrets are read through `src/lib/env.ts`'s `requireEnv()`
+helper, which throws a clear `Missing required environment variable: X`
+error rather than failing obscurely later. They're only ever imported
+from Server Actions and Route Handlers (`src/app/actions/billing.ts`,
+`src/app/api/webhooks/stripe/route.ts`, and the two server-only client
+factories) -- never from a Client Component, and never inlined into the
+client JS bundle (verified: only `NEXT_PUBLIC_`-prefixed variables are).
+
+### Supabase
+
+- `npm run db:start` / `db:stop` -- start/stop the local stack
+- `npm run db:reset` -- drop, recreate, apply all migrations, seed
+- `npm run db:migration:new <name>` -- scaffold a new migration
+- Never edit an already-applied migration; add a new one instead
+  (see `supabase/migrations/20260821010000_drop_dead_match_score_function.sql`
+  for an example production-safe cleanup migration).
+
+### Stripe (local)
+
+Real Stripe API calls (Checkout/Customer Portal session creation) need a
+real Stripe test-mode secret key. To exercise the webhook handler without
+one, either:
+
+- run the Stripe CLI (`stripe listen --forward-to localhost:3000/api/webhooks/stripe`)
+  against a real test-mode account, or
+- send a self-signed synthetic event using the `stripe` npm package's
+  `stripe.webhooks.generateTestHeaderString()` against your own
+  `STRIPE_WEBHOOK_SECRET` -- this is how Phase 9/10 testing verified
+  signature verification, idempotency, and the full subscription/invoice
+  lifecycle without any real Stripe credentials.
+
+## Testing commands
 
 ```bash
+npm run typecheck     # tsc --noEmit
+npm run lint          # eslint
+npm run format:check  # prettier --check .
 npm run build         # production build
-npm run start          # run the production build locally
-npm run lint            # eslint
-npm run typecheck      # tsc --noEmit
-npm run format         # prettier -- write
-npm run format:check  # prettier -- check only
 ```
 
-## Project structure
+There is no automated test suite (unit/integration/e2e) checked into the
+repo. Every phase's browser/API/RLS regression testing was performed
+live against a local Supabase stack with Playwright and direct
+`psql`/REST calls, then the temporary test scripts and dependencies were
+removed before committing -- see each phase's commit history and
+`docs/PRODUCTION-LAUNCH.md` for what was and wasn't verified this way.
 
-```
-src/
-  app/                  # Next.js App Router routes, layout, global styles
-  components/
-    ui/                 # Foundational, generic UI primitives (shadcn/ui)
-    layout/              # App shell: navbar, footer
-    yardola/             # Yardola-specific components (project cards, etc.)
-  lib/
-    supabase/            # Supabase client/server utility factories
-    env.ts               # Typed environment variable access
-    utils.ts              # Shared helpers (e.g. `cn`)
-  types/                 # Shared TypeScript types
-supabase/
-  migrations/            # Versioned SQL migrations (schema, RLS, indexes)
-  seed.sql                # Dev-only fixture data -- not production data
-  config.toml             # Local Supabase stack configuration
-```
+## Production deployment
 
-## Design system
-
-Brand tokens (colors, fonts, radii) live in `src/app/globals.css` as CSS
-custom properties consumed by Tailwind v4's `@theme inline`. Key tokens:
-
-- Colors: `primary` (Yardola Green), `secondary`/`accent` (Warm Sand),
-  `background` (Cream), plus raw brand colors `yardola-green`,
-  `deep-forest`, `warm-sand`, `cream`, `charcoal`.
-- Fonts: `font-display` (DM Serif Display, used for headings) and
-  `font-sans` (Inter, used for body/UI text).
-
-The visual direction favors editorial layouts, generous white space, and
-photography over heavy color, gradients, or shadows.
-
-## Database schema overview
-
-The full schema is defined across `supabase/migrations/`. Broad groups:
-
-- **Identity**: `profiles` (1:1 with Supabase `auth.users`, created
-  automatically on signup via a trigger).
-- **Locations**: `states` -> `metros` -> `cities` -> `neighborhoods` ->
-  `zip_codes`, Yardola's curated taxonomy for browse/SEO pages (V1 seeds
-  Nevada / Las Vegas metro only).
-- **Taxonomy**: `categories`, `services` (per category), `features`,
-  `styles` -- lookup tables rather than enums so admins can expand them
-  without a migration.
-- **Businesses**: `businesses`, `business_profiles` (public presentation
-  content), `professionals`, `business_services`,
-  `business_service_areas`.
-- **Projects**: `projects` (the core entity) plus `project_categories`,
-  `project_services`, `project_styles`, `project_features`,
-  `project_photos`.
-- **Planning & leads**: `project_plans`, `leads`, `lead_matches`,
-  `lead_events`. Match scoring and lead routing logic land in a later
-  phase -- this phase only stores the resulting data.
-- **Saved projects & claims**: `saved_projects`, `business_claims`.
-- **Content**: `guides`.
-- **Monetization**: `plans`, `subscriptions`, `transactions` -- schema
-  only, no payment provider wired up yet.
-
-Every table has Row Level Security enabled. Roughly: reference/lookup
-data and published content is publicly readable; homeowners manage their
-own profile, project plans, saved projects, and leads; business users
-manage businesses/projects they own; admins can manage everything. See
-the RLS policies inline in each migration for the exact rules.
-
-## What's not built yet
-
-By design, this repository does not yet include: authentication UI,
-public project/business discovery pages, the project planner UI, lead
-routing/matching logic, business dashboards, admin dashboards, SEO page
-generation, Stripe/payment integration, or AI features. These are scoped
-for later phases.
+See [`docs/PRODUCTION-LAUNCH.md`](docs/PRODUCTION-LAUNCH.md) for the full
+checklist. In short: provision a real Supabase project and apply every
+migration, set all required environment variables (including a real
+`NEXT_PUBLIC_SITE_URL`), configure Stripe in live mode (products/prices,
+webhook endpoint, signing secret), and re-run the smoke tests against the
+deployed environment -- local verification does not substitute for
+production verification.
