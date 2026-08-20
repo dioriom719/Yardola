@@ -15,7 +15,9 @@ import {
 import { listSimilarProjects } from "@/lib/data/projects";
 import { listRelatedGuides } from "@/lib/data/guides";
 import { getCategoryBySlug } from "@/lib/data/categories";
+import { isProjectSaved } from "@/lib/data/saved-projects";
 import { buildProjectJsonLd } from "@/lib/seo/structured-data";
+import { SaveProjectButton } from "@/components/yardola/save-project-button";
 import type { ProjectDetail } from "@/types/project";
 
 interface ProjectDetailViewProps {
@@ -25,7 +27,7 @@ interface ProjectDetailViewProps {
 export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
   const primaryCategory = project.categories[0] ?? null;
 
-  const [similarProjects, relatedGuides] = await Promise.all([
+  const [similarProjects, relatedGuides, alreadySaved] = await Promise.all([
     listSimilarProjects(project, 4),
     primaryCategory
       ? getCategoryBySlug(primaryCategory.slug).then((category) =>
@@ -34,6 +36,7 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
             : []
         )
       : Promise.resolve([]),
+    isProjectSaved(project.id),
   ]);
 
   const details: { label: string; value: string }[] = [
@@ -90,9 +93,17 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
             {primaryCategory.name}
           </span>
         )}
-        <h1 className="font-display text-foreground mt-1 text-3xl sm:text-4xl">
-          {project.title}
-        </h1>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <h1 className="font-display text-foreground mt-1 text-3xl sm:text-4xl">
+            {project.title}
+          </h1>
+          <SaveProjectButton
+            projectId={project.id}
+            initialSaved={alreadySaved}
+            variant="full"
+            className="mt-1 shrink-0"
+          />
+        </div>
         <p className="text-muted-foreground mt-2">
           {project.neighborhoodName ? `${project.neighborhoodName}, ` : ""}
           {project.cityName}
@@ -206,7 +217,18 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
             <Button
               className="mt-4 w-full"
               nativeButton={false}
-              render={<Link href="/plan" />}
+              render={
+                <Link
+                  href={`/plan/start?${new URLSearchParams({
+                    ...(primaryCategory
+                      ? { category: primaryCategory.slug }
+                      : {}),
+                    ...(project.styles[0]
+                      ? { style: project.styles[0].slug }
+                      : {}),
+                  }).toString()}`}
+                />
+              }
             >
               Plan a Similar Project
             </Button>

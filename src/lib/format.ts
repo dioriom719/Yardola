@@ -1,5 +1,6 @@
 import type {
   BudgetRange,
+  ProjectTimeline,
   PropertyType,
   VerificationStatus,
 } from "@/types/enums";
@@ -42,4 +43,36 @@ export function formatVerificationStatus(value: VerificationStatus) {
 
 export function formatProjectYear(value: number | null | undefined) {
   return value ? String(value) : null;
+}
+
+const TIMELINE_LABELS: Record<ProjectTimeline, string> = {
+  planning_only: "Just researching",
+  asap: "As soon as possible",
+  "1_3_months": "Within 1–3 months",
+  "3_6_months": "3–6 months",
+  "6_12_months": "6–12 months",
+};
+
+export function formatTimeline(value: ProjectTimeline | null | undefined) {
+  return value ? TIMELINE_LABELS[value] : null;
+}
+
+const DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+
+export function formatDate(value: string | null | undefined) {
+  return value ? DATE_FORMATTER.format(new Date(value)) : null;
+}
+
+/** A plan without a homeowner-chosen name falls back to its first project type. */
+export function formatPlanTitle(
+  title: string | null,
+  categoryNames: string[]
+): string {
+  if (title) return title;
+  if (categoryNames.length > 0) return `My ${categoryNames[0]} Project`;
+  return "My Backyard Plan";
 }

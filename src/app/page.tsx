@@ -10,6 +10,7 @@ import {
   listCategoriesWithSampleImage,
 } from "@/lib/data/categories";
 import { listFeaturedProjects } from "@/lib/data/projects";
+import { listSavedProjectIds } from "@/lib/data/saved-projects";
 import { listFeaturedBusinesses } from "@/lib/data/businesses";
 import { listGuides } from "@/lib/data/guides";
 import { generateHomeMetadata } from "@/lib/seo/metadata";
@@ -46,6 +47,9 @@ export default async function Home() {
       listFeaturedBusinesses(4),
       listGuides(3),
     ]);
+  const savedProjectIds = await listSavedProjectIds(
+    featuredProjects.map((project) => project.id)
+  );
 
   return (
     <>
@@ -129,7 +133,11 @@ export default async function Home() {
             </div>
             <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {featuredProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  initialSaved={savedProjectIds.has(project.id)}
+                />
               ))}
             </div>
           </div>

@@ -39,14 +39,25 @@ export const SEO_THRESHOLDS = {
 
 /**
  * robots.txt Disallow list -- reserved for routes that should never be
- * crawled at all (private application surfaces, API routes). This is
- * deliberately narrow: `/plan` and other not-yet-useful public pages are
- * still crawlable, just marked `noindex` in their own metadata, so
- * search engines can see and honor that directive instead of only
- * seeing "blocked by robots.txt". Kept centralized so robots.ts and any
- * future gating logic agree.
+ * crawled at all: API routes, and every private/authenticated surface
+ * (account pages, the planner, and the auth flow itself). All of these
+ * also carry their own `noindex` metadata as a second layer, so a crawl
+ * that somehow reaches one anyway still won't index it -- but there's no
+ * public content behind login here worth crawling in the first place,
+ * unlike a page such as a future public landing page that's merely
+ * "not yet useful," which would get noindex only, not Disallow. Kept
+ * centralized so robots.ts and any future gating logic agree.
  */
-export const DISALLOWED_ROBOTS_PATHS = ["/api/"] as const;
+export const DISALLOWED_ROBOTS_PATHS = [
+  "/api/",
+  "/account",
+  "/plan",
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/auth/",
+] as const;
 
 /**
  * Sitemap sections, one per `generateSitemaps()` id in `app/sitemap.ts`.

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { AccountMenu } from "@/components/layout/account-menu";
+import { createClient } from "@/lib/supabase/server";
 
 const NAV_LINKS = [
   { href: "/projects", label: "Projects" },
@@ -12,7 +14,12 @@ const NAV_LINKS = [
  * by MobileBottomNav instead -- this header collapses to just the
  * wordmark there.
  */
-export function Navbar() {
+export async function Navbar() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <header className="border-border bg-background/95 supports-backdrop-filter:bg-background/80 sticky top-0 z-40 border-b backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -35,7 +42,18 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden items-center gap-2 md:flex">
+          {user ? (
+            <AccountMenu />
+          ) : (
+            <Button
+              variant="ghost"
+              nativeButton={false}
+              render={<Link href="/login" />}
+            >
+              Sign In
+            </Button>
+          )}
           <Button nativeButton={false} render={<Link href="/plan" />}>
             Plan My Project
           </Button>

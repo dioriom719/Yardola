@@ -32,6 +32,33 @@ export async function listCities(): Promise<City[]> {
   return (data ?? []).map(mapCity);
 }
 
+export interface ZipCode {
+  id: string;
+  code: string;
+  cityId: string;
+}
+
+/**
+ * Every curated zip in the market -- small enough (a handful per city)
+ * to fetch in one call and filter client-side by the planner's selected
+ * city, rather than round-tripping per selection.
+ */
+export async function listZipCodes(): Promise<ZipCode[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("zip_codes")
+    .select("id, code, city_id")
+    .order("code", { ascending: true })
+    .returns<{ id: string; code: string; city_id: string }[]>();
+
+  if (error) throw error;
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    code: row.code,
+    cityId: row.city_id,
+  }));
+}
+
 export async function getCityBySlug(slug: string): Promise<City | null> {
   const supabase = await createClient();
   const { data, error } = await supabase

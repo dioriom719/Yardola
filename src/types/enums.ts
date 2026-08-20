@@ -23,3 +23,8 @@ export type VerificationStatus = "unverified" | "pending" | "verified";
 export type BusinessStatus = "pending" | "active" | "inactive" | "suspended";
 
 export type GuideStatus = "draft" | "published" | "archived";
+
+export type ProjectTimeline =
+  "planning_only" | "asap" | "1_3_months" | "3_6_months" | "6_12_months";
+
+export type ProjectPlanStatus = "draft" | "submitted" | "matched" | "closed";

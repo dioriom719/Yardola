@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
+import { ChromeVisibility } from "@/components/layout/chrome-visibility";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
   buildOrganizationJsonLd,
@@ -42,8 +43,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <JsonLd data={buildWebsiteJsonLd()} />
         <Navbar />
         <main className="flex flex-1 flex-col">{children}</main>
-        <Footer />
-        <MobileBottomNav />
+        <ChromeVisibility>
+          <Footer />
+        </ChromeVisibility>
+        <ChromeVisibility>
+          <MobileBottomNav />
+        </ChromeVisibility>
         <Toaster />
       </body>
     </html>

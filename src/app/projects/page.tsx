@@ -10,6 +10,7 @@ import { listCategories } from "@/lib/data/categories";
 import { listCities } from "@/lib/data/locations";
 import { listStyles } from "@/lib/data/styles";
 import { listProjects, type ProjectFilters } from "@/lib/data/projects";
+import { listSavedProjectIds } from "@/lib/data/saved-projects";
 import { paramInt, paramString } from "@/lib/search-params";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { SearchX } from "lucide-react";
@@ -83,6 +84,9 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
     listCities(),
     listStyles(),
   ]);
+  const savedProjectIds = await listSavedProjectIds(
+    result.items.map((project) => project.id)
+  );
 
   const hasActiveFilters = Object.values(filters).some(Boolean);
 
@@ -127,6 +131,7 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
       <div className="mt-4">
         <ProjectGrid
           projects={result.items}
+          savedProjectIds={savedProjectIds}
           emptyState={
             <EmptyState
               icon={SearchX}

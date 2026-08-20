@@ -1,36 +1,41 @@
-import Link from "next/link";
-import { Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { listCategories } from "@/lib/data/categories";
+import { listCities, listZipCodes } from "@/lib/data/locations";
+import { listStyles } from "@/lib/data/styles";
+import { listFeatures } from "@/lib/data/features";
+import { getPlanDetail } from "@/lib/data/plans";
+import { PlannerWizard } from "./_components/planner-wizard";
 
-// Planner pages are explicitly noindex -- there's no useful content here
-// yet, just a placeholder for the CTA destination.
 export const metadata = buildMetadata({
   title: "Plan My Project | Yardola",
-  description: "The Yardola project planner is coming soon.",
+  description: "Shape your backyard project idea into a plan, step by step.",
   path: "/plan",
   index: false,
 });
 
-/**
- * Placeholder destination for every "Plan My Project" CTA across the
- * site. The interactive planner is a later phase -- this just needs to
- * exist so those links don't 404.
- */
-export default function PlanPage() {
+export default async function PlanPage(props: PageProps<"/plan">) {
+  const searchParams = await props.searchParams;
+  const planId =
+    typeof searchParams.planId === "string" ? searchParams.planId : null;
+
+  const [categories, cities, zipCodes, styles, features, initialPlan] =
+    await Promise.all([
+      listCategories(),
+      listCities(),
+      listZipCodes(),
+      listStyles(),
+      listFeatures(),
+      planId ? getPlanDetail(planId) : Promise.resolve(null),
+    ]);
+
   return (
-    <div className="mx-auto flex max-w-2xl flex-1 flex-col items-center justify-center px-4 py-20 text-center sm:px-6 lg:px-8">
-      <EmptyState
-        icon={Sparkles}
-        title="The Project Planner is coming soon"
-        description="Soon you'll be able to shape your backyard project idea step by step -- category, location, budget, and style -- and get matched with the right Las Vegas professionals."
-        action={
-          <Button nativeButton={false} render={<Link href="/projects" />}>
-            Explore Projects for Inspiration
-          </Button>
-        }
-      />
-    </div>
+    <PlannerWizard
+      categories={categories}
+      cities={cities}
+      zipCodes={zipCodes}
+      styles={styles}
+      features={features}
+      initialPlan={initialPlan}
+    />
   );
 }

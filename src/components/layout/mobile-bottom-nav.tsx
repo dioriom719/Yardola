@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { toast } from "sonner";
 import { Home, Compass, Sparkles, Bookmark, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,20 +9,25 @@ const NAV_ITEMS = [
   { href: "/", label: "Home", icon: Home },
   { href: "/projects", label: "Explore", icon: Compass },
   { href: "/plan", label: "Plan", icon: Sparkles },
-] as const;
-
-const PLACEHOLDER_ITEMS = [
-  { label: "Saved", icon: Bookmark },
-  { label: "Account", icon: User },
+  { href: "/account/saved", label: "Saved", icon: Bookmark },
+  { href: "/account", label: "Account", icon: User },
 ] as const;
 
 /**
- * Mobile-only primary navigation. Saved and Account are placeholders
- * until authentication exists -- they surface a toast instead of
- * navigating to a route that doesn't exist yet.
+ * Mobile-only primary navigation. /account/** is a protected prefix --
+ * proxy.ts redirects a signed-out visitor to /login?next=... before any
+ * page code runs, so these links don't need their own auth check.
  */
 export function MobileBottomNav() {
   const pathname = usePathname();
+
+  // Pick the single longest-prefix match (e.g. "/account/saved" wins
+  // over "/account" for that path) so two tabs never light up at once.
+  const activeHref = [...NAV_ITEMS]
+    .filter((item) =>
+      item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
+    )
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
     <nav
@@ -32,10 +36,7 @@ export function MobileBottomNav() {
     >
       <div className="grid grid-cols-5">
         {NAV_ITEMS.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+          const isActive = item.href === activeHref;
           return (
             <Link
               key={item.href}
@@ -51,21 +52,6 @@ export function MobileBottomNav() {
             </Link>
           );
         })}
-        {PLACEHOLDER_ITEMS.map((item) => (
-          <button
-            key={item.label}
-            type="button"
-            onClick={() =>
-              toast("Coming soon", {
-                description: `${item.label} will be available once sign-in is live.`,
-              })
-            }
-            className="text-muted-foreground/60 focus-visible:ring-ring flex flex-col items-center gap-1 py-2.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
-          >
-            <item.icon className="size-5" aria-hidden="true" />
-            {item.label}
-          </button>
-        ))}
       </div>
     </nav>
   );
