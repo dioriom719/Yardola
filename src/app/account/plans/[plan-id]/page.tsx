@@ -15,6 +15,7 @@ import {
 import {
   formatBudgetRange,
   formatDate,
+  formatMatchTier,
   formatOpportunityStatus,
   formatPlanTitle,
   formatTimeline,
@@ -224,7 +225,10 @@ export default async function PlanDetailPage(
                   <div className="flex items-center gap-3 text-right">
                     <div>
                       <p className="text-sm font-medium">
-                        {Math.round(match.matchScore)}% match
+                        {formatMatchTier(match.matchScore)}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {Math.round(match.matchScore)}% fit
                       </p>
                       <Button
                         size="sm"
@@ -238,7 +242,11 @@ export default async function PlanDetailPage(
                       </Button>
                     </div>
                     {match.status === "interested" && (
-                      <ConnectButton matchId={match.id} planId={plan.id} />
+                      <ConnectButton
+                        matchId={match.id}
+                        planId={plan.id}
+                        businessName={match.businessName}
+                      />
                     )}
                   </div>
                 </div>

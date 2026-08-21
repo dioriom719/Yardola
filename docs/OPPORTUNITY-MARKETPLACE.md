@@ -151,6 +151,17 @@ a raw count implying their information has been "blasted" to a large
 contractor list -- only their own up-to-5 matches and those businesses'
 engagement status.
 
+**Phase 14** added a confirmation dialog before the Connect action
+actually fires: "Connect with {business}? Your name, email, and phone
+number will be shared with {business}..." with "Not yet" / "Yes,
+connect" -- so sharing contact info is always a deliberate, explained
+choice, never a single accidental click. Phase 14 also recast the raw
+0-100 match score as a plain-English tier ("Strong match" / "Good
+match" / "Fair match", with the percentage kept alongside as
+supporting detail, not hidden) on both the homeowner's match cards and
+the business's opportunity cards, and added a short "why you're a
+match" line on the business side.
+
 ### Business experience
 
 `/business/leads` ("Opportunities") shows each matched opportunity's

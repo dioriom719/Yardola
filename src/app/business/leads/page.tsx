@@ -1,9 +1,14 @@
+import Link from "next/link";
+import { Handshake, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { listBusinessOpportunities } from "@/lib/data/business-leads";
+import { listOwnedBusinesses } from "@/lib/data/business-portal";
 import {
   formatBudgetRange,
+  formatMatchTier,
   formatOpportunityStatus,
   formatTimeline,
 } from "@/lib/format";
@@ -32,8 +37,18 @@ const STATUS_BADGE_VARIANT: Record<
   lost: "secondary",
 };
 
+/** A short, honest reason this opportunity was routed to this business -- what the homeowner is looking for that matched. */
+function matchReason(categories: string[], city: string | null): string {
+  const what =
+    categories.length > 0 ? categories.join(" and ") + " services" : "services";
+  return city ? `You offer ${what} in ${city}.` : `You offer ${what}.`;
+}
+
 export default async function BusinessOpportunitiesPage() {
-  const opportunities = await listBusinessOpportunities();
+  const [opportunities, businesses] = await Promise.all([
+    listBusinessOpportunities(),
+    listOwnedBusinesses(),
+  ]);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -54,14 +69,37 @@ export default async function BusinessOpportunitiesPage() {
       </div>
 
       {opportunities.length === 0 ? (
-        <div className="border-border bg-secondary/30 mt-10 rounded-xl border p-8 text-center">
-          <h2 className="font-display text-foreground text-xl">
-            No opportunities yet
-          </h2>
-          <p className="text-muted-foreground mx-auto mt-2 max-w-lg text-sm">
-            Keep your services and service areas up to date. New homeowner
-            projects are evaluated automatically.
-          </p>
+        <div className="mt-10">
+          {businesses.length === 0 ? (
+            <EmptyState
+              icon={Sparkles}
+              title="Add your business to start receiving opportunities"
+              description="YARDOLO matches homeowner projects to businesses with a listing. Create or claim your business to get started."
+              action={
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button
+                    nativeButton={false}
+                    render={<Link href="/business/onboarding" />}
+                  >
+                    Create a business
+                  </Button>
+                  <Button
+                    variant="outline"
+                    nativeButton={false}
+                    render={<Link href="/business/claim" />}
+                  >
+                    Claim an existing listing
+                  </Button>
+                </div>
+              }
+            />
+          ) : (
+            <EmptyState
+              icon={Handshake}
+              title="No opportunities yet"
+              description="Keep your services and service areas up to date so YARDOLO can match you to the right homeowner projects. New projects are evaluated automatically -- there's nothing else to do."
+            />
+          )}
         </div>
       ) : (
         <div className="mt-8 space-y-4">
@@ -72,14 +110,11 @@ export default async function BusinessOpportunitiesPage() {
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="font-display text-foreground text-xl">
-                      {opp.plan.title ||
-                        opp.plan.categories.join(" + ") ||
-                        "Backyard project"}
-                    </h2>
-                    <Badge>{Math.round(opp.matchScore)}% match</Badge>
-                  </div>
+                  <h2 className="font-display text-foreground text-xl">
+                    {opp.plan.title ||
+                      opp.plan.categories.join(" + ") ||
+                      "Backyard project"}
+                  </h2>
                   <p className="text-muted-foreground mt-1 text-sm">
                     {opp.plan.categories.join(", ") ||
                       "Project type not specified"}
@@ -93,7 +128,7 @@ export default async function BusinessOpportunitiesPage() {
                 </Badge>
               </div>
 
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="mt-5 grid gap-4 sm:grid-cols-3">
                 <div>
                   <p className="text-muted-foreground text-xs tracking-wide uppercase">
                     Budget
@@ -112,6 +147,17 @@ export default async function BusinessOpportunitiesPage() {
                     {formatTimeline(
                       opp.plan.timeline as ProjectTimeline | null
                     ) ?? "Not specified"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs tracking-wide uppercase">
+                    Why you&apos;re a match
+                  </p>
+                  <p className="mt-1 text-sm font-medium">
+                    {formatMatchTier(opp.matchScore)}
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    {matchReason(opp.plan.categories, opp.plan.city)}
                   </p>
                 </div>
               </div>

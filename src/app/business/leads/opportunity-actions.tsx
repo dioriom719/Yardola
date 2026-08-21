@@ -38,37 +38,75 @@ export function OpportunityActions({
 
   if (status === "pending" || status === "sent" || status === "viewed") {
     return (
-      <Button
-        size="sm"
-        disabled={isPending}
-        onClick={() =>
-          handle(expressInterestAction, "You're pursuing this opportunity.")
-        }
-      >
-        I&apos;m interested
-      </Button>
+      <div>
+        <Button
+          size="sm"
+          disabled={isPending}
+          onClick={() =>
+            handle(
+              expressInterestAction,
+              "You're interested. The homeowner will be able to connect with you."
+            )
+          }
+        >
+          I&apos;m interested
+        </Button>
+        <p className="text-muted-foreground mt-2 text-xs">
+          The homeowner decides whether to connect. Your contact info isn&apos;t
+          shared until they do.
+        </p>
+      </div>
+    );
+  }
+
+  if (status === "interested") {
+    return (
+      <p className="text-muted-foreground text-sm">
+        You&apos;re interested. Waiting for the homeowner to connect with you.
+      </p>
     );
   }
 
   if (status === "connected") {
     return (
-      <div className="flex gap-2">
-        <Button
-          size="sm"
-          disabled={isPending}
-          onClick={() => handle(markOpportunityWonAction, "Marked as won.")}
-        >
-          Mark won
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={isPending}
-          onClick={() => handle(markOpportunityLostAction, "Marked as lost.")}
-        >
-          Mark lost
-        </Button>
+      <div>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            disabled={isPending}
+            onClick={() =>
+              handle(markOpportunityWonAction, "Nice work -- marked as won.")
+            }
+          >
+            Mark won
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={isPending}
+            onClick={() => handle(markOpportunityLostAction, "Marked as lost.")}
+          >
+            Mark lost
+          </Button>
+        </div>
+        <p className="text-muted-foreground mt-2 text-xs">
+          Let us know how it goes once you&apos;ve spoken with the homeowner.
+        </p>
       </div>
+    );
+  }
+
+  if (status === "won") {
+    return (
+      <p className="text-muted-foreground text-sm">You won this project.</p>
+    );
+  }
+
+  if (status === "lost") {
+    return (
+      <p className="text-muted-foreground text-sm">
+        Marked as lost. Keep an eye out for new opportunities.
+      </p>
     );
   }
 

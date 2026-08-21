@@ -124,6 +124,18 @@ export function formatOpportunityStatus(value: OpportunityStatus): string {
   return OPPORTUNITY_STATUS_LABELS[value];
 }
 
+/**
+ * Recasts a raw 0-100 match score as a plain-English tier so homeowners
+ * and businesses read "Strong match" rather than interpreting a bare
+ * percentage. The number is still shown alongside it -- this reframes
+ * the score, it doesn't hide it.
+ */
+export function formatMatchTier(score: number): string {
+  if (score >= 70) return "Strong match";
+  if (score >= 40) return "Good match";
+  return "Fair match";
+}
+
 /** A plan without a homeowner-chosen name falls back to its first project type. */
 export function formatPlanTitle(
   title: string | null,
