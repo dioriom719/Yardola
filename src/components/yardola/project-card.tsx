@@ -9,7 +9,10 @@ interface ProjectCardProps {
   initialSaved?: boolean;
 }
 
-export function ProjectCard({ project, initialSaved = false }: ProjectCardProps) {
+export function ProjectCard({
+  project,
+  initialSaved = false,
+}: ProjectCardProps) {
   const budgetLabel = formatBudgetRange(project.budgetRange);
   const imageSrc = project.heroImageUrl
     ? `/api/image-proxy?url=${encodeURIComponent(project.heroImageUrl)}`
@@ -35,7 +38,10 @@ export function ProjectCard({ project, initialSaved = false }: ProjectCardProps)
           />
         )}
         <div className="absolute top-2 right-2 z-20">
-          <SaveProjectButton projectId={project.id} initialSaved={initialSaved} />
+          <SaveProjectButton
+            projectId={project.id}
+            initialSaved={initialSaved}
+          />
         </div>
       </div>
       <div className="pointer-events-none space-y-1.5 p-4">
@@ -49,13 +55,17 @@ export function ProjectCard({ project, initialSaved = false }: ProjectCardProps)
             <span className="text-muted-foreground text-xs">{budgetLabel}</span>
           )}
         </div>
-        <h3 className="font-display text-foreground line-clamp-1 text-lg">{project.title}</h3>
+        <h3 className="font-display text-foreground line-clamp-1 text-lg">
+          {project.title}
+        </h3>
         <p className="text-muted-foreground text-sm">
           {project.cityName}
           {project.styleName ? ` · ${project.styleName}` : ""}
         </p>
         {project.businessName && (
-          <p className="text-muted-foreground text-xs">By {project.businessName}</p>
+          <p className="text-muted-foreground text-xs">
+            By {project.businessName}
+          </p>
         )}
       </div>
     </div>

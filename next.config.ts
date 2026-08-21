@@ -32,8 +32,7 @@ const nextConfig: NextConfig = {
         ? [
             {
               protocol: supabaseUrl.protocol.replace(":", "") as
-                | "http"
-                | "https",
+                "http" | "https",
               hostname: supabaseUrl.hostname,
               port: supabaseUrl.port || undefined,
               pathname: "/storage/v1/object/**",
