@@ -7,6 +7,7 @@ import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { ProjectCard } from "@/components/yardola/project-card";
 import { PlanActionsMenu } from "@/app/account/plans/plan-actions-menu";
 import { SubmitPlanButton } from "@/app/account/plans/submit-plan-button";
+import { ConnectButton } from "@/app/account/plans/connect-button";
 import {
   RemovePhotoButton,
   RemoveInspirationButton,
@@ -14,12 +15,13 @@ import {
 import {
   formatBudgetRange,
   formatDate,
+  formatOpportunityStatus,
   formatPlanTitle,
   formatTimeline,
 } from "@/lib/format";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getPlanDetail } from "@/lib/data/plans";
-import { getLeadForPlan } from "@/lib/data/leads";
+import { getLeadForPlan, summarizeEngagement } from "@/lib/data/leads";
 
 export const metadata = buildMetadata({
   title: "Project Plan | YARDOLO",
@@ -172,25 +174,36 @@ export default async function PlanDetailPage(
       <section className="border-border bg-secondary/40 mt-10 rounded-lg border p-6">
         {lead && lead.matches.length > 0 ? (
           <>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="font-display text-foreground text-xl">
-                  Your professional matches
-                </h2>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  We matched your project with {lead.matches.length} active
-                  YARDOLO professionals.
-                </p>
-              </div>
-              <Badge>
-                {lead.status === "matched" ? "Matched" : lead.status}
-              </Badge>
-            </div>
+            {(() => {
+              const engagement = summarizeEngagement(lead.matches);
+              return (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="font-display text-foreground text-xl">
+                      Your professional matches
+                    </h2>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      {engagement.matchedCount} professional
+                      {engagement.matchedCount === 1 ? "" : "s"} matched
+                      {engagement.interestedCount > 0
+                        ? ` · ${engagement.interestedCount} interested`
+                        : ""}
+                      {engagement.connectedCount > 0
+                        ? ` · ${engagement.connectedCount} connected`
+                        : ""}
+                    </p>
+                  </div>
+                  {engagement.connectionAvailable && (
+                    <Badge>Connection available</Badge>
+                  )}
+                </div>
+              );
+            })()}
             <div className="mt-5 space-y-3">
               {lead.matches.map((match) => (
                 <div
                   key={match.id}
-                  className="bg-background border-border flex items-center justify-between gap-4 rounded-lg border p-4"
+                  className="bg-background border-border flex flex-wrap items-center justify-between gap-4 rounded-lg border p-4"
                 >
                   <div>
                     <Link
@@ -204,21 +217,29 @@ export default async function PlanDetailPage(
                         {match.city}
                       </p>
                     )}
+                    <Badge variant="secondary" className="mt-2">
+                      {formatOpportunityStatus(match.status)}
+                    </Badge>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">
-                      {Math.round(match.matchScore)}% match
-                    </p>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      nativeButton={false}
-                      render={
-                        <Link href={`/professionals/${match.businessSlug}`} />
-                      }
-                    >
-                      View
-                    </Button>
+                  <div className="flex items-center gap-3 text-right">
+                    <div>
+                      <p className="text-sm font-medium">
+                        {Math.round(match.matchScore)}% match
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        nativeButton={false}
+                        render={
+                          <Link href={`/professionals/${match.businessSlug}`} />
+                        }
+                      >
+                        View
+                      </Button>
+                    </div>
+                    {match.status === "interested" && (
+                      <ConnectButton matchId={match.id} planId={plan.id} />
+                    )}
                   </div>
                 </div>
               ))}

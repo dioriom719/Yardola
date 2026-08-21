@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireUserId } from "@/lib/supabase/auth";
+import type { OpportunityStatus } from "@/lib/data/business-leads";
 
 export interface LeadMatchSummary {
   id: string;
@@ -8,7 +9,7 @@ export interface LeadMatchSummary {
   businessSlug: string;
   city: string | null;
   matchScore: number;
-  status: "pending" | "sent" | "viewed" | "accepted" | "rejected" | "expired";
+  status: OpportunityStatus;
 }
 
 export interface LeadSummary {
@@ -96,5 +97,43 @@ export async function getLeadForPlan(
     createdAt: lead.created_at,
     matchCount: mapped.length,
     matches: mapped,
+  };
+}
+
+/**
+ * The homeowner facilitates a connection with a business that has
+ * expressed interest. Idempotent; ownership and the "must be interested
+ * first" rule are enforced by the RPC. This is the only point at which
+ * the matched business's opportunity view starts showing the
+ * homeowner's contact details -- see get_business_opportunities().
+ */
+export async function connectWithOpportunity(matchId: string): Promise<void> {
+  const supabase = await createClient();
+  await requireUserId(supabase);
+  const { error } = await supabase.rpc("connect_opportunity", {
+    target_match_id: matchId,
+  });
+  if (error) throw error;
+}
+
+const CONNECTED_OR_LATER: ReadonlySet<OpportunityStatus> = new Set([
+  "connected",
+  "won",
+  "lost",
+]);
+const INTERESTED_OR_LATER: ReadonlySet<OpportunityStatus> = new Set([
+  "interested",
+  ...CONNECTED_OR_LATER,
+]);
+
+/** A small, reassuring summary of contractor engagement for the homeowner -- never exposes contractor-private information. */
+export function summarizeEngagement(matches: LeadMatchSummary[]) {
+  return {
+    matchedCount: matches.length,
+    interestedCount: matches.filter((m) => INTERESTED_OR_LATER.has(m.status))
+      .length,
+    connectionAvailable: matches.some((m) => m.status === "interested"),
+    connectedCount: matches.filter((m) => CONNECTED_OR_LATER.has(m.status))
+      .length,
   };
 }

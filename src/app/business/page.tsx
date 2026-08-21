@@ -10,7 +10,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildMetadata({
   title: "Professional Dashboard | YARDOLO",
-  description: "Manage your YARDOLO business profile and homeowner leads.",
+  description:
+    "Manage your YARDOLO business profile and qualified homeowner opportunities.",
   path: "/business",
   index: false,
 });
@@ -76,7 +77,9 @@ export default async function BusinessDashboardPage() {
                     <div className="font-display text-xl">
                       {business.leadCount}
                     </div>
-                    <div className="text-muted-foreground text-xs">Leads</div>
+                    <div className="text-muted-foreground text-xs">
+                      Opportunities
+                    </div>
                   </div>
                   <div className="bg-secondary/40 rounded-lg p-3">
                     <div className="font-display text-xl">
@@ -112,7 +115,7 @@ export default async function BusinessDashboardPage() {
                     nativeButton={false}
                     render={<Link href="/business/leads" />}
                   >
-                    View leads
+                    View opportunities
                   </Button>
                   <Button
                     variant="outline"

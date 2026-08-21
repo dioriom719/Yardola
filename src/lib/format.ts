@@ -6,6 +6,7 @@ import type {
   SubscriptionStatus,
   VerificationStatus,
 } from "@/types/enums";
+import type { OpportunityStatus } from "@/lib/data/business-leads";
 
 const BUDGET_RANGE_LABELS: Record<BudgetRange, string> = {
   under_10k: "Under $10K",
@@ -103,6 +104,24 @@ const SUBSCRIPTION_STATUS_LABELS: Record<SubscriptionStatus, string> = {
 
 export function formatSubscriptionStatus(value: SubscriptionStatus): string {
   return SUBSCRIPTION_STATUS_LABELS[value];
+}
+
+const OPPORTUNITY_STATUS_LABELS: Record<OpportunityStatus, string> = {
+  pending: "New",
+  sent: "New",
+  viewed: "Viewed",
+  interested: "Interested",
+  connected: "Connected",
+  won: "Won",
+  lost: "Lost",
+  accepted: "Interested",
+  rejected: "Lost",
+  expired: "Expired",
+};
+
+/** Maps the internal match_status lifecycle onto the "qualified opportunity" language used everywhere in the product. */
+export function formatOpportunityStatus(value: OpportunityStatus): string {
+  return OPPORTUNITY_STATUS_LABELS[value];
 }
 
 /** A plan without a homeowner-chosen name falls back to its first project type. */
