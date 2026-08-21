@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireUserId } from "@/lib/supabase/auth";
 import { listPlanPhotos } from "@/lib/data/plan-photos";
+import { submitProjectPlan } from "@/lib/data/leads";
 import {
   PROJECT_CARD_FIELDS,
   mapProjectCard,
@@ -500,4 +501,41 @@ export async function deletePlan(planId: string): Promise<void> {
     .eq("id", planId)
     .eq("user_id", userId);
   if (error) throw error;
+}
+
+export interface AnonymousPlanInput {
+  categoryIds: string[];
+  cityId: string;
+  zipCodeId: string | null;
+  budgetRange: BudgetRange | null;
+  timeline: ProjectTimeline | null;
+  description: string;
+}
+
+/**
+ * Creates, fills in, and submits a plan in one call for the homepage's
+ * no-login builder -- used once a session exists (either immediately
+ * after signup, or after the homeowner confirms their email and returns
+ * to resume). Deliberately just a thin composition of the same
+ * `createDraftPlan`/`updatePlan*`/`submitProjectPlan` functions the
+ * authenticated `/plan` wizard already calls one step at a time -- same
+ * auth check (`requireUserId`), same RLS, same matching RPC. No new
+ * database access pattern.
+ */
+export async function createAndSubmitAnonymousPlan(
+  input: AnonymousPlanInput
+): Promise<{ planId: string; leadId: string; matchCount: number }> {
+  const planId = await createDraftPlan();
+  await updatePlanCategories(planId, input.categoryIds);
+  await updatePlanLocation(planId, {
+    cityId: input.cityId,
+    zipCodeId: input.zipCodeId,
+  });
+  if (input.budgetRange) await updatePlanBudget(planId, input.budgetRange);
+  if (input.timeline) await updatePlanTimeline(planId, input.timeline);
+  if (input.description.trim())
+    await updatePlanDescription(planId, input.description);
+
+  const { leadId, matchCount } = await submitProjectPlan(planId);
+  return { planId, leadId, matchCount };
 }

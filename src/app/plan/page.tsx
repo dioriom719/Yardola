@@ -5,6 +5,7 @@ import { listStyles } from "@/lib/data/styles";
 import { listFeatures } from "@/lib/data/features";
 import { getPlanDetail } from "@/lib/data/plans";
 import { PlannerWizard } from "./_components/planner-wizard";
+import { ResumePendingPlan } from "./_components/resume-pending-plan";
 
 export const metadata = buildMetadata({
   title: "Plan My Project | YARDOLO",
@@ -29,13 +30,16 @@ export default async function PlanPage(props: PageProps<"/plan">) {
     ]);
 
   return (
-    <PlannerWizard
-      categories={categories}
-      cities={cities}
-      zipCodes={zipCodes}
-      styles={styles}
-      features={features}
-      initialPlan={initialPlan}
-    />
+    <>
+      <ResumePendingPlan />
+      <PlannerWizard
+        categories={categories}
+        cities={cities}
+        zipCodes={zipCodes}
+        styles={styles}
+        features={features}
+        initialPlan={initialPlan}
+      />
+    </>
   );
 }
