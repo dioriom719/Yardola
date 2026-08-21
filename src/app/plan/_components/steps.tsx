@@ -76,15 +76,44 @@ export function LocationStep({
     <div className="space-y-5">
       <div className="space-y-1.5">
         <label className="text-sm font-medium">City</label>
+        {/*
+          Two deliberate, isolated fixes to this Select (Phase 18), neither
+          touching the shared Select component or any other Select usage:
+          1. `value={cityId ?? ""}` -- Base UI's Select treats an `undefined`
+             value as uncontrolled; a null cityId on first render followed by
+             a real id after selection flipped it from uncontrolled to
+             controlled, which Base UI warns about. "" never matches an item
+             (see hasSelectedValue's stringifyAsValue check), so the
+             placeholder still shows, but the value stays a defined string
+             for the component's whole lifetime.
+          2. `<SelectValue>` given a render function -- this Select never
+             passes an `items` map to `Select.Root` (we use declarative
+             `SelectItem` children instead), so Base UI's built-in
+             `resolveSelectedLabel` has nothing to look the id up against
+             and falls back to rendering the raw stored value, i.e. the
+             city's UUID, as the trigger's label. That's a real, more severe
+             bug than the console warning -- confirmed via screenshot, not
+             just source reading. The render function resolves the label
+             ourselves from the same `cities` array already used to build
+             the options, which is the correct fix for a Select without an
+             `items` prop.
+        */}
         <Select
-          value={cityId ?? undefined}
+          value={cityId ?? ""}
           onValueChange={(value) => {
             onCityChange(String(value));
             onZipChange(null);
           }}
         >
           <SelectTrigger className="h-12 w-full">
-            <SelectValue placeholder="Choose a city" />
+            <SelectValue placeholder="Choose a city">
+              {(value: string) => {
+                const city = cities.find((c) => c.id === value);
+                return city
+                  ? `${city.name}, ${city.stateAbbreviation}`
+                  : "Choose a city";
+              }}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {cities.map((city) => (
@@ -102,11 +131,15 @@ export function LocationStep({
             Zip code <span className="text-muted-foreground">(optional)</span>
           </label>
           <Select
-            value={zipCodeId ?? undefined}
+            value={zipCodeId ?? ""}
             onValueChange={(value) => onZipChange(String(value))}
           >
             <SelectTrigger className="h-12 w-full">
-              <SelectValue placeholder="Not sure" />
+              <SelectValue placeholder="Not sure">
+                {(value: string) =>
+                  zipOptions.find((z) => z.id === value)?.code ?? "Not sure"
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {zipOptions.map((zip) => (
