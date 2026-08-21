@@ -31,6 +31,20 @@ export const metadata = buildMetadata({
   index: false,
 });
 
+/**
+ * A short, honest reason this professional was matched -- what the
+ * homeowner asked for that this business offers. Never references match
+ * scores, plan tiers, or anything not actually true of the match.
+ */
+function matchReason(categoryNames: string[], businessCity: string | null) {
+  const what =
+    categoryNames.length > 0 ? categoryNames.join(" and ") + " services" : "";
+  if (what && businessCity) return `Offers ${what} in ${businessCity}.`;
+  if (what) return `Offers ${what}.`;
+  if (businessCity) return `Serves ${businessCity}.`;
+  return "Matches your project's category and location.";
+}
+
 export default async function PlanDetailPage(
   props: PageProps<"/account/plans/[plan-id]">
 ) {
@@ -227,8 +241,8 @@ export default async function PlanDetailPage(
                       <p className="text-sm font-medium">
                         {formatMatchTier(match.matchScore)}
                       </p>
-                      <p className="text-muted-foreground text-xs">
-                        {Math.round(match.matchScore)}% fit
+                      <p className="text-muted-foreground max-w-40 text-xs">
+                        {matchReason(categoryNames, match.city)}
                       </p>
                       <Button
                         size="sm"
@@ -237,6 +251,7 @@ export default async function PlanDetailPage(
                         render={
                           <Link href={`/professionals/${match.businessSlug}`} />
                         }
+                        className="mt-2"
                       >
                         View
                       </Button>
@@ -253,6 +268,17 @@ export default async function PlanDetailPage(
               ))}
             </div>
           </>
+        ) : lead ? (
+          <div className="text-center">
+            <h2 className="font-display text-foreground text-xl">
+              We&apos;re looking for a match
+            </h2>
+            <p className="text-muted-foreground mx-auto mt-2 max-w-xl text-sm">
+              We haven&apos;t found a matching professional yet. Your project is
+              still active, and we&apos;ll show qualified matches here as soon
+              as they&apos;re available.
+            </p>
+          </div>
         ) : (
           <div className="text-center">
             <h2 className="font-display text-foreground text-xl">

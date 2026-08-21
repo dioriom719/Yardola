@@ -49,7 +49,10 @@ const STEP_META: { title: string; description?: string }[] = [
     description:
       "Choose everything that applies -- real backyard projects often combine a few of these.",
   },
-  { title: "Where is the project?" },
+  {
+    title: "Where is the project?",
+    description: "We'll use this to find professionals who serve your area.",
+  },
   {
     title: "What does your backyard look like today?",
     description: "Photos are optional but help you keep your ideas organized.",

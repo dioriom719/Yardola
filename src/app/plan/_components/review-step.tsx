@@ -66,6 +66,11 @@ export function ReviewStep({
 
   return (
     <div className="space-y-8">
+      <p className="text-muted-foreground text-sm">
+        Take a look before you save. Once it&apos;s saved, you&apos;ll be able
+        to find professionals who match this project.
+      </p>
+
       <div className="space-y-1.5">
         <label htmlFor="plan-title" className="text-sm font-medium">
           Plan name

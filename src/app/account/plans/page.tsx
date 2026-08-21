@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
@@ -12,6 +13,7 @@ import {
 } from "@/lib/format";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { listPlans } from "@/lib/data/plans";
+import { formatPlanEngagement, listPlanEngagement } from "@/lib/data/leads";
 
 export const metadata = buildMetadata({
   title: "My Plans | YARDOLO",
@@ -28,6 +30,9 @@ export default async function PlansPage(props: PageProps<"/account/plans">) {
   const visiblePlans = showArchived
     ? plans.filter((p) => p.status === "closed")
     : plans;
+  const engagementByPlanId = await listPlanEngagement(
+    visiblePlans.map((p) => p.id)
+  );
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
@@ -99,9 +104,27 @@ export default async function PlansPage(props: PageProps<"/account/plans">) {
                 </Link>
                 <div className="pointer-events-none flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="font-display text-foreground text-lg">
-                      {formatPlanTitle(plan.title, categoryNames)}
-                    </h2>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="font-display text-foreground text-lg">
+                        {formatPlanTitle(plan.title, categoryNames)}
+                      </h2>
+                      {plan.status !== "closed" &&
+                        (() => {
+                          const engagement = engagementByPlanId.get(plan.id);
+                          const label = formatPlanEngagement(engagement);
+                          return (
+                            <Badge
+                              variant={
+                                engagement?.connectionAvailable
+                                  ? "default"
+                                  : "secondary"
+                              }
+                            >
+                              {label}
+                            </Badge>
+                          );
+                        })()}
+                    </div>
                     <p className="text-muted-foreground mt-1 text-sm">
                       {meta.length > 0
                         ? meta.join(" · ")

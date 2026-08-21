@@ -137,3 +137,80 @@ export function summarizeEngagement(matches: LeadMatchSummary[]) {
       .length,
   };
 }
+
+export interface PlanEngagement {
+  submitted: boolean;
+  matchedCount: number;
+  connectionAvailable: boolean;
+  connectedCount: number;
+}
+
+/**
+ * Batched version of getLeadForPlan()'s engagement summary for the "My
+ * Plans" list, so a homeowner with several plans can see which ones need
+ * attention without opening each one. Two queries total regardless of
+ * plan count (RLS still scopes both to the caller's own leads).
+ */
+export async function listPlanEngagement(
+  planIds: string[]
+): Promise<Map<string, PlanEngagement>> {
+  const result = new Map<string, PlanEngagement>();
+  if (planIds.length === 0) return result;
+
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+
+  const { data: leadRows, error: leadError } = await supabase
+    .from("leads")
+    .select("id, project_plan_id")
+    .in("project_plan_id", planIds)
+    .eq("homeowner_id", userId)
+    .returns<{ id: string; project_plan_id: string }[]>();
+  if (leadError) throw leadError;
+  if (!leadRows || leadRows.length === 0) return result;
+
+  for (const row of leadRows) {
+    result.set(row.project_plan_id, {
+      submitted: true,
+      matchedCount: 0,
+      connectionAvailable: false,
+      connectedCount: 0,
+    });
+  }
+
+  const leadIdToPlanId = new Map(
+    leadRows.map((row) => [row.id, row.project_plan_id])
+  );
+  const { data: matchRows, error: matchError } = await supabase
+    .from("lead_matches")
+    .select("lead_id, match_status")
+    .in(
+      "lead_id",
+      leadRows.map((row) => row.id)
+    )
+    .returns<{ lead_id: string; match_status: LeadMatchSummary["status"] }[]>();
+  if (matchError) throw matchError;
+
+  for (const match of matchRows ?? []) {
+    const planId = leadIdToPlanId.get(match.lead_id);
+    const engagement = planId ? result.get(planId) : undefined;
+    if (!engagement) continue;
+    engagement.matchedCount++;
+    if (match.match_status === "interested")
+      engagement.connectionAvailable = true;
+    if (CONNECTED_OR_LATER.has(match.match_status)) engagement.connectedCount++;
+  }
+
+  return result;
+}
+
+/** Homeowner-friendly label for a plan's current state -- never a raw DB status. */
+export function formatPlanEngagement(
+  engagement: PlanEngagement | undefined
+): string {
+  if (!engagement?.submitted) return "Draft";
+  if (engagement.connectedCount > 0) return "Connected";
+  if (engagement.connectionAvailable) return "Ready to connect";
+  if (engagement.matchedCount > 0) return "Waiting for a professional";
+  return "Finding professionals";
+}

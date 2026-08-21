@@ -157,10 +157,26 @@ number will be shared with {business}..." with "Not yet" / "Yes,
 connect" -- so sharing contact info is always a deliberate, explained
 choice, never a single accidental click. Phase 14 also recast the raw
 0-100 match score as a plain-English tier ("Strong match" / "Good
-match" / "Fair match", with the percentage kept alongside as
-supporting detail, not hidden) on both the homeowner's match cards and
-the business's opportunity cards, and added a short "why you're a
-match" line on the business side.
+match" / "Fair match") on both the homeowner's match cards and the
+business's opportunity cards, and added a short "why you're a match"
+line on the business side.
+
+**Phase 17** removed the raw percentage that had shipped alongside the
+tier label on the homeowner's match cards (`/account/plans/[plan-id]`)
+-- a homeowner should never see an internal match score, only the
+qualitative tier -- and added an equivalent "why this professional"
+line there (`matchReason()`, mirroring the business side's), built only
+from facts the match already carries (the plan's categories and the
+business's city). Phase 17 also distinguished "not yet submitted" from
+"submitted, no matches yet" on that page (previously both states
+rendered the same "Ready to find a professional?" prompt with a
+resubmit button, which was misleading once a plan had actually been
+submitted), and added a homeowner-friendly status badge per plan on
+`/account/plans` (Draft / Finding professionals / Waiting for a
+professional / Ready to connect / Connected) via
+`listPlanEngagement()`/`formatPlanEngagement()` in `src/lib/data/leads.ts` --
+two batched, RLS-scoped queries regardless of how many plans the
+homeowner has, never a raw DB status.
 
 ### Business experience
 

@@ -84,6 +84,10 @@ export default async function Home() {
                 Explore Projects
               </Button>
             </div>
+            <p className="text-muted-foreground mt-4 text-sm">
+              Free for homeowners. Tell us what you need, and we&apos;ll help
+              you find professionals who fit.
+            </p>
           </div>
           <div
             aria-hidden="true"
