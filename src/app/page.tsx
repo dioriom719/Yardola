@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Compass, Sparkles, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,9 @@ const STEPS = [
     description: "Find professionals who fit.",
   },
 ] as const;
+
+const HERO_IMAGE =
+  "https://commons.wikimedia.org/wiki/Special:Redirect/file/Backyard_Las_Vegas_Pool.jpg";
 
 export default async function Home() {
   const categories = await listCategories();
@@ -89,10 +93,17 @@ export default async function Home() {
               you find professionals who fit.
             </p>
           </div>
-          <div
-            aria-hidden="true"
-            className="border-border bg-sand/60 aspect-[4/3] rounded-lg border"
-          />
+          <div className="border-border bg-muted relative aspect-[4/3] overflow-hidden rounded-lg border">
+            <Image
+              src={HERO_IMAGE}
+              alt="Las Vegas backyard pool and outdoor living space"
+              fill
+              priority
+              unoptimized
+              sizes="(min-width: 768px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
         </div>
       </section>
 
