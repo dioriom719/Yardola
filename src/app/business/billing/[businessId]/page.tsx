@@ -21,6 +21,7 @@ import {
   formatPlanFeature,
   formatPriceCents,
   formatSubscriptionStatus,
+  formatUpgradeReason,
 } from "@/lib/format";
 import { Check } from "lucide-react";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -197,11 +198,9 @@ export default async function BusinessBillingPage({
             const isCurrent = subscription?.plan.id === plan.id && isSubscribed;
             const canCheckout = Boolean(plan.stripePriceId) && !isCurrent;
             const upgradeReason =
-              plan.slug === "featured"
-                ? "Get priority visibility among qualified opportunities."
-                : plan.slug === "premium"
-                  ? "Get the highest marketplace priority and maximum exposure."
-                  : null;
+              plan.slug === "featured" || plan.slug === "premium"
+                ? formatUpgradeReason(plan.slug)
+                : null;
             return (
               <article
                 key={plan.id}

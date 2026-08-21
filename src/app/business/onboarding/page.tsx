@@ -27,6 +27,11 @@ export default function BusinessOnboardingPage() {
           Create your listing with the information homeowners need to understand
           who you are and where you work.
         </p>
+        <p className="text-muted-foreground mt-3 text-sm">
+          After this, you&apos;ll choose a plan and add your services and
+          service areas -- that&apos;s what YARDOLO uses to match you with the
+          right homeowner projects.
+        </p>
       </div>
       <form
         action={createBusiness}

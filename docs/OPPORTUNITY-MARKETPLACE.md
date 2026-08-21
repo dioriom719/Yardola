@@ -173,6 +173,23 @@ Connected. Opening the page marks any new opportunity as Viewed (there's
 no separate detail route in v1, so viewing the list _is_ opening the
 opportunity).
 
+**Contractor dashboard/onboarding conventions (Phase 16).** `/business`
+computes one contextual primary action per business, in priority order:
+an incomplete profile (`profileComplete`/`missingSteps` in
+`listOwnedBusinesses()`, derived from already-fetched fields -- no new
+columns) always wins over everything else, since YARDOLO can't present or
+match a business it doesn't have basic information for; then getting
+matched at all; then the day-to-day "view opportunities" loop. A plan
+upgrade is never the primary action -- `nextPlanSlug()`/
+`formatUpgradeReason()` in `src/lib/format.ts` surface it as a quiet,
+secondary nudge only once the core loop already has activity (an active
+business with opportunities), on the dashboard card and at the bottom of
+`/business/leads`. This keeps with the standing rule that paying more
+changes marketplace priority, never qualification, and that upgrade
+messaging stays contextual rather than a constant banner. Future phases
+adding more dashboard entry points should reuse `primaryAction()`'s
+priority order rather than inventing a new one.
+
 ### Entitlements
 
 The Phase 9 entitlement system (`plans.max_active_leads`,

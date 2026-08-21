@@ -189,6 +189,27 @@ export function formatPlanTagline(slug: string): string {
   return PLAN_TAGLINE_LABELS[slug] ?? "Get Started";
 }
 
+/** The next tier up from a plan slug, or null if it's already the top tier. Drives contextual upgrade nudges -- never used to gate entitlements. */
+const NEXT_PLAN_SLUG: Record<string, string | null> = {
+  basic: "featured",
+  featured: "premium",
+  premium: null,
+};
+
+export function nextPlanSlug(slug: string): string | null {
+  return slug in NEXT_PLAN_SLUG ? NEXT_PLAN_SLUG[slug] : "featured";
+}
+
+/** Short, honest reason to consider the next tier up -- never a guaranteed-lead claim. */
+const UPGRADE_REASON_LABELS: Record<string, string> = {
+  featured: "Get priority visibility among qualified opportunities.",
+  premium: "Get the highest marketplace priority and maximum exposure.",
+};
+
+export function formatUpgradeReason(targetSlug: string): string {
+  return UPGRADE_REASON_LABELS[targetSlug] ?? "Get more marketplace exposure.";
+}
+
 /** A plan without a homeowner-chosen name falls back to its first project type. */
 export function formatPlanTitle(
   title: string | null,

@@ -78,6 +78,10 @@ export default async function BusinessServicesPage({
       <form action={action} className="mt-8 space-y-8">
         <section className="border-border rounded-xl border p-6">
           <h2 className="font-display text-xl">Services</h2>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Tell us what you specialize in so YARDOLO can match you with the
+            right homeowner projects.
+          </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {(services ?? []).map((service) => (
               <label
@@ -105,6 +109,9 @@ export default async function BusinessServicesPage({
         </section>
         <section className="border-border rounded-xl border p-6">
           <h2 className="font-display text-xl">Service areas</h2>
+          <p className="text-muted-foreground mt-1 text-sm">
+            YARDOLO only routes you opportunities within these areas.
+          </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {(cities ?? []).map((city) => (
               <label

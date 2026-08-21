@@ -19,6 +19,30 @@ export interface OwnedBusiness {
   leadCount: number;
   planName: string;
   planSlug: string;
+  /** Whether the profile has everything YARDOLO uses to present and match this business. See `missingSteps` for what's left. */
+  profileComplete: boolean;
+  /** Plain-English, ordered list of what's missing -- the first entry is the most useful next step. */
+  missingSteps: string[];
+}
+
+function computeProfileCompleteness(business: {
+  description: string | null;
+  phone: string | null;
+  email: string | null;
+  city: string | null;
+  state: string | null;
+  serviceCount: number;
+  areaCount: number;
+}): { profileComplete: boolean; missingSteps: string[] } {
+  const missingSteps: string[] = [];
+  if (!business.description) missingSteps.push("Add a business description");
+  if (!business.phone && !business.email)
+    missingSteps.push("Add contact information");
+  if (!business.city || !business.state)
+    missingSteps.push("Add your business location");
+  if (business.serviceCount === 0) missingSteps.push("Add your services");
+  if (business.areaCount === 0) missingSteps.push("Add your service areas");
+  return { profileComplete: missingSteps.length === 0, missingSteps };
 }
 
 export async function listOwnedBusinesses(): Promise<OwnedBusiness[]> {
@@ -49,25 +73,40 @@ export async function listOwnedBusinesses(): Promise<OwnedBusiness[]> {
     businesses.map((b) => getLeadEntitlement(supabase, b.id))
   );
 
-  return businesses.map((business, i) => ({
-    id: business.id,
-    name: business.name,
-    slug: business.slug,
-    description: business.description,
-    website: business.website,
-    phone: business.phone,
-    email: business.email,
-    logoUrl: business.logo_url,
-    city: business.city,
-    state: business.state,
-    status: business.status,
-    verificationStatus: business.verification_status,
-    serviceCount: business.business_services?.[0]?.count ?? 0,
-    areaCount: business.business_service_areas?.[0]?.count ?? 0,
-    leadCount: business.lead_matches?.[0]?.count ?? 0,
-    planName: entitlements[i].planName,
-    planSlug: entitlements[i].planSlug,
-  }));
+  return businesses.map((business, i) => {
+    const serviceCount = business.business_services?.[0]?.count ?? 0;
+    const areaCount = business.business_service_areas?.[0]?.count ?? 0;
+    const { profileComplete, missingSteps } = computeProfileCompleteness({
+      description: business.description,
+      phone: business.phone,
+      email: business.email,
+      city: business.city,
+      state: business.state,
+      serviceCount,
+      areaCount,
+    });
+    return {
+      id: business.id,
+      name: business.name,
+      slug: business.slug,
+      description: business.description,
+      website: business.website,
+      phone: business.phone,
+      email: business.email,
+      logoUrl: business.logo_url,
+      city: business.city,
+      state: business.state,
+      status: business.status,
+      verificationStatus: business.verification_status,
+      serviceCount,
+      areaCount,
+      leadCount: business.lead_matches?.[0]?.count ?? 0,
+      planName: entitlements[i].planName,
+      planSlug: entitlements[i].planSlug,
+      profileComplete,
+      missingSteps,
+    };
+  });
 }
 
 export interface MyBusinessClaim {

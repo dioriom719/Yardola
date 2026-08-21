@@ -5,12 +5,16 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { listBusinessOpportunities } from "@/lib/data/business-leads";
+import { listActivePlans } from "@/lib/data/billing";
 import { listOwnedBusinesses } from "@/lib/data/business-portal";
 import {
   formatBudgetRange,
   formatMatchTier,
   formatOpportunityStatus,
+  formatPriceCents,
   formatTimeline,
+  formatUpgradeReason,
+  nextPlanSlug,
 } from "@/lib/format";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { OpportunityActions } from "./opportunity-actions";
@@ -45,10 +49,20 @@ function matchReason(categories: string[], city: string | null): string {
 }
 
 export default async function BusinessOpportunitiesPage() {
-  const [opportunities, businesses] = await Promise.all([
+  const [opportunities, businesses, plans] = await Promise.all([
     listBusinessOpportunities(),
     listOwnedBusinesses(),
+    listActivePlans(),
   ]);
+
+  // Only shown for a single-business owner -- with multiple businesses on
+  // different plans, "explore Featured" would be ambiguous about which
+  // business it applies to, so we skip the nudge rather than guess.
+  const soleBusiness = businesses.length === 1 ? businesses[0] : null;
+  const upgradeSlug = soleBusiness ? nextPlanSlug(soleBusiness.planSlug) : null;
+  const upgradePriceCents = upgradeSlug
+    ? (plans.find((p) => p.slug === upgradeSlug)?.priceCents ?? null)
+    : null;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -97,7 +111,18 @@ export default async function BusinessOpportunitiesPage() {
             <EmptyState
               icon={Handshake}
               title="No opportunities yet"
-              description="Keep your services and service areas up to date so YARDOLO can match you to the right homeowner projects. New projects are evaluated automatically -- there's nothing else to do."
+              description="YARDOLO is looking for projects that match your services and service area. New projects are evaluated automatically -- keeping your profile current is the best way to improve your odds."
+              action={
+                <Button
+                  variant="outline"
+                  nativeButton={false}
+                  render={
+                    <Link href={`/business/services/${businesses[0].id}`} />
+                  }
+                >
+                  Review my profile
+                </Button>
+              }
             />
           )}
         </div>
@@ -210,6 +235,27 @@ export default async function BusinessOpportunitiesPage() {
               </div>
             </article>
           ))}
+
+          {soleBusiness && upgradeSlug && (
+            <div className="border-border bg-secondary/20 rounded-xl border p-5 text-sm sm:p-6">
+              <p className="text-muted-foreground">
+                Want more marketplace visibility?{" "}
+                {formatUpgradeReason(upgradeSlug)}
+              </p>
+              <Button
+                className="mt-3"
+                variant="outline"
+                size="sm"
+                nativeButton={false}
+                render={<Link href={`/business/billing/${soleBusiness.id}`} />}
+              >
+                Explore {upgradeSlug === "premium" ? "Premium" : "Featured"}
+                {upgradePriceCents != null
+                  ? ` — ${formatPriceCents(upgradePriceCents)}/mo`
+                  : ""}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
