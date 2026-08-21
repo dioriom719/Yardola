@@ -7,17 +7,18 @@ Initial market: Las Vegas, Nevada.
 > **Discover what you want -> Plan what you want -> Find someone who can
 > build it.**
 
-This repository has completed **Phase 11: Production Deployment & Real
-Service Integration** (verification pass). Phases 1-9 built the product
-end to end: the public discovery/SEO surface, homeowner auth and project
-planner, lead matching and routing, the business portal, and
-Stripe-backed business billing. Phase 10 audited the whole codebase for
-production readiness and fixed what could safely be fixed in
-code/config/migrations. Phase 11 re-verified every one of those claims
-live against a fresh local stack -- RLS, storage isolation, the Stripe
-webhook handler, and the full homeowner/business flows -- and found no
-new bugs. What remains is exclusively what requires real production
-credentials this repository cannot hold: a live Supabase project, a live
+This repository has completed **Phase 12: Production Launch Setup &
+Deployment Preparation**. Phases 1-9 built the product end to end: the
+public discovery/SEO surface, homeowner auth and project planner, lead
+matching and routing, the business portal, and Stripe-backed business
+billing. Phase 10 audited the whole codebase for production readiness.
+Phase 11 re-verified every one of those claims live against a fresh
+local stack. Phase 12 reviewed hosting/deployment readiness specifically
+(Vercel/Next.js compatibility, environment-variable contract, a real
+CI-reliability bug fixed in the `typecheck` script) and reorganized the
+launch checklist around who can act on each remaining item. What remains
+is exclusively what requires real production credentials and decisions
+this repository cannot hold or make: a live Supabase project, a live
 Stripe account with confirmed pricing, a chosen domain, and hosting
 access -- see [`docs/PRODUCTION-LAUNCH.md`](docs/PRODUCTION-LAUNCH.md)
 for the full launch checklist.
