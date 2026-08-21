@@ -38,5 +38,6 @@ export interface BusinessTransaction {
 /** Server-trusted lead-visibility entitlement for a business. */
 export interface LeadEntitlement {
   planName: string;
+  planSlug: string;
   maxActiveLeads: number | null;
 }

@@ -17,9 +17,12 @@ import {
 import {
   formatBillingInterval,
   formatDate,
+  formatPlanAdvantage,
+  formatPlanFeature,
   formatPriceCents,
   formatSubscriptionStatus,
 } from "@/lib/format";
+import { Check } from "lucide-react";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { createClient } from "@/lib/supabase/server";
 
@@ -115,6 +118,9 @@ export default async function BusinessBillingPage({
                 ? `${formatPriceCents(subscription.plan.priceCents)}${formatBillingInterval(subscription.plan.billingInterval)}`
                 : "No active subscription"}
             </p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {formatPlanAdvantage(subscription?.plan.slug ?? "basic")}
+            </p>
           </div>
           {subscription && (
             <Badge variant={isSubscribed ? "default" : "secondary"}>
@@ -190,11 +196,24 @@ export default async function BusinessBillingPage({
           {plans.map((plan) => {
             const isCurrent = subscription?.plan.id === plan.id && isSubscribed;
             const canCheckout = Boolean(plan.stripePriceId) && !isCurrent;
+            const upgradeReason =
+              plan.slug === "featured"
+                ? "Get priority visibility among qualified opportunities."
+                : plan.slug === "premium"
+                  ? "Get the highest marketplace priority and maximum exposure."
+                  : null;
             return (
               <article
                 key={plan.id}
-                className="border-border bg-card flex flex-col rounded-xl border p-5"
+                className={
+                  plan.slug === "featured"
+                    ? "border-primary relative flex flex-col rounded-xl border-2 p-5"
+                    : "border-border bg-card flex flex-col rounded-xl border p-5"
+                }
               >
+                {plan.slug === "featured" && (
+                  <Badge className="absolute -top-3 left-5">Most popular</Badge>
+                )}
                 <h3 className="font-display text-lg">{plan.name}</h3>
                 <p className="mt-1 text-2xl font-semibold">
                   {formatPriceCents(plan.priceCents)}
@@ -209,6 +228,17 @@ export default async function BusinessBillingPage({
                     {plan.description}
                   </p>
                 )}
+                <ul className="mt-4 space-y-1.5 text-sm">
+                  {plan.features.map((key) => (
+                    <li key={key} className="flex items-start gap-2">
+                      <Check
+                        className="text-primary mt-0.5 size-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span>{formatPlanFeature(key)}</span>
+                    </li>
+                  ))}
+                </ul>
                 <div className="mt-auto pt-5">
                   {isCurrent ? (
                     <Badge>Current plan</Badge>
@@ -218,6 +248,11 @@ export default async function BusinessBillingPage({
                       <Button type="submit" className="w-full">
                         {isSubscribed ? "Switch to this plan" : "Choose plan"}
                       </Button>
+                      {upgradeReason && (
+                        <p className="text-muted-foreground mt-2 text-xs">
+                          {upgradeReason}
+                        </p>
+                      )}
                     </form>
                   ) : (
                     <Button type="button" className="w-full" disabled>

@@ -182,13 +182,24 @@ opportunities are returned per business -- resolved (won/lost)
 opportunities are always shown as history and never count against the
 cap. `max_active_leads` is still a plain, already-configurable database
 column: Basic is capped, Featured/Premium are `null` (unlimited) in
-today's seed data. **No pricing or capacity decision was made or changed
-this phase** -- this is the same fallback that existed before Phase 13,
-called out explicitly here per the standing instruction not to invent a
+today's seed data. **No capacity decision was made or changed this
+phase** -- this is the same fallback that existed before Phase 13, called
+out explicitly here per the standing instruction not to invent a
 permanent limit. Nothing about the matching or opportunity code hardcodes
 "unlimited" -- it reads whatever `max_active_leads` says, so introducing
 a real Featured/Premium cap later is a data change, not a code or
 matching-logic change.
+
+**Pricing was locked in Phase 15**: Basic $0/mo, Featured $299/mo,
+Premium $699/mo (see `supabase/seed.sql` and
+`docs/PRODUCTION-LAUNCH.md`). This is approved launch pricing, not a
+placeholder. Real Stripe Products/Prices have still not been created --
+`plans.stripe_price_id` remains `null` for every tier -- so production
+billing is still pending Stripe configuration. Entitlements across all
+three tiers remain priority/exposure within the unchanged matching and
+5-match cap above, never a promise of a guaranteed or fixed number of
+leads, and the homeowner-facing PII protection above applies identically
+regardless of the connected business's plan.
 
 ## Explicitly not built this phase (see the Phase 13 brief's "not in scope")
 

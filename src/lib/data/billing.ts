@@ -163,31 +163,45 @@ export async function getLeadEntitlement(
 ): Promise<LeadEntitlement> {
   const { data: sub, error: subError } = await supabase
     .from("subscriptions")
-    .select(`status, plans(name, max_active_leads)`)
+    .select(`status, plans(name, slug, max_active_leads)`)
     .eq("business_id", businessId)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle<{
       status: BusinessSubscription["status"];
-      plans: { name: string; max_active_leads: number | null } | null;
+      plans: {
+        name: string;
+        slug: string;
+        max_active_leads: number | null;
+      } | null;
     }>();
   if (subError) throw subError;
 
   if (sub?.plans && SUBSCRIBED_STATUSES.includes(sub.status)) {
     return {
       planName: sub.plans.name,
+      planSlug: sub.plans.slug,
       maxActiveLeads: sub.plans.max_active_leads,
     };
   }
 
   const { data: basic, error: basicError } = await supabase
     .from("plans")
-    .select("name, max_active_leads")
+    .select("name, slug, max_active_leads")
     .eq("slug", "basic")
     .eq("is_active", true)
-    .maybeSingle<{ name: string; max_active_leads: number | null }>();
+    .maybeSingle<{
+      name: string;
+      slug: string;
+      max_active_leads: number | null;
+    }>();
   if (basicError) throw basicError;
 
-  if (!basic) return { planName: "none", maxActiveLeads: null };
-  return { planName: basic.name, maxActiveLeads: basic.max_active_leads };
+  if (!basic)
+    return { planName: "none", planSlug: "none", maxActiveLeads: null };
+  return {
+    planName: basic.name,
+    planSlug: basic.slug,
+    maxActiveLeads: basic.max_active_leads,
+  };
 }

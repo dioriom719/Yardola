@@ -1,6 +1,6 @@
 # YARDOLO Production Launch Checklist
 
-Last updated by Phase 12. This document is organized around one question
+Last updated by Phase 15. This document is organized around one question
 for every item: **who or what can act on this next?** Five categories:
 
 - **COMPLETED IN CODE** -- implemented and verified (see verification
@@ -9,8 +9,9 @@ for every item: **who or what can act on this next?** Five categories:
   does not have (a real Supabase project, a real Stripe account, hosting
   access). No decision is needed, just the credential.
 - **REQUIRES USER DECISION** -- blocked on a choice only the product
-  owner can make (pricing, domain). Providing credentials alone would not
-  unblock these.
+  owner can make (domain). Providing credentials alone would not unblock
+  these. (Pricing was in this category through Phase 14; it was locked in
+  Phase 15 -- see below.)
 - **REQUIRES DEPLOYMENT** -- can only be done once the app is actually
   running somewhere real (not local Docker).
 - **REQUIRES POST-DEPLOYMENT VERIFICATION** -- must be manually re-checked
@@ -148,14 +149,12 @@ Purely blocked on access -- no decision needed once you provide these.
 Blocked on a choice, not a credential -- providing access alone would not
 unblock these.
 
-- [ ] **Confirmed production pricing.** The only pricing anywhere in this
-      repository is `supabase/seed.sql`'s dev/placeholder data -- Basic
-      $0/mo, Featured $99/mo, Premium $249/mo -- explicitly commented as
-      fictional dev data. **Not confirmed as real launch pricing.** Per
-      standing instructions, no Stripe Products or Prices were created
-      this phase, in test mode or otherwise, pending your confirmation.
-      Stripe Prices are effectively immutable once created (you archive
-      and recreate rather than edit), so confirm before creating anything.
+- [x] ~~Confirmed production pricing~~ -- **locked as of Phase 15**: Basic
+      $0/mo, Featured $299/mo, Premium $699/mo. `supabase/seed.sql`
+      reflects this. This is approved launch pricing, not placeholder
+      data. What's still pending is the credential/action items below --
+      creating the matching Stripe Products/Prices -- not the pricing
+      decision itself.
 - [ ] **A production domain.** Nothing in this repository specifies or
       guesses one. `NEXT_PUBLIC_SITE_URL` remains unset with no
       committed real-domain value.
@@ -218,8 +217,10 @@ deploying with real credentials, manually verify at minimum:
    never skip, reorder, or edit an already-applied one.
 3. **Do not run `supabase/seed.sql` against production.** It is
    explicitly fictional/dev-only data: fake businesses, projects,
-   guides, placeholder images, and placeholder pricing. Production
-   should receive migrations only -- no seed data of any kind. This
+   guides, and placeholder images. Production should receive migrations
+   only -- no seed data of any kind, not even the `plans` rows (the
+   locked pricing they contain is correct -- see below -- but the row
+   still needs to be inserted directly, not via this file). This
    repository's development data and its production setup are
    intentionally two separate paths; nothing in `supabase/seed.sql`
    should ever be copied into a production database, in whole or in
@@ -239,10 +240,14 @@ deploying with real credentials, manually verify at minimum:
    with `public: false` by migration; verify this wasn't overridden in
    the dashboard).
 
-## Manual Stripe setup steps (only once pricing is confirmed)
+## Manual Stripe setup steps
 
-1. Create the Basic/Featured/Premium Products and Prices in test mode
-   first, matching the confirmed pricing.
+Locked launch pricing (Phase 15): **Basic $0/mo (free, no Stripe object
+needed), Featured $299/mo, Premium $699/mo.**
+
+1. Create the Featured ($299/mo) and Premium ($699/mo) Products and
+   Prices in Stripe -- test mode first, live mode only once test mode is
+   fully verified. Basic is free and needs no Stripe Product/Price.
 2. Copy each Price's id into the corresponding `plans.stripe_price_id`
    row.
 3. Once deployed, create a webhook endpoint pointing at

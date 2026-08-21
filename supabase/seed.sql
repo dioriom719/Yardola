@@ -429,7 +429,18 @@ join public.categories c on c.slug = v.category_slug;
 -- a null stripe_price_id can be listed but not checked out.
 -- ----------------------------------------------------------------------------
 
+-- Locked launch pricing (Phase 15): Basic $0, Featured $299/mo, Premium
+-- $699/mo. The primary value across paid tiers is marketplace priority
+-- and exposure among qualified opportunities -- not a promise of more
+-- (let alone guaranteed) leads. `features` lists each tier's own
+-- incremental entitlements (not cumulative); the pricing/billing UI
+-- renders "Everything in <lower tier>, plus:" itself. See
+-- src/lib/format.ts's PLAN_FEATURE_LABELS for the customer-facing text
+-- and docs/OPPORTUNITY-MARKETPLACE.md for the full pricing writeup.
 insert into public.plans (name, slug, description, price_cents, billing_interval, features, max_active_leads, sort_order) values
-  ('Basic', 'basic', 'Free listing with a standard business profile.', 0, 'month', '["business_profile", "up_to_5_projects"]'::jsonb, 5, 1),
-  ('Featured', 'featured', 'Priority placement in category and location browse pages.', 9900, 'month', '["business_profile", "unlimited_projects", "featured_placement"]'::jsonb, null, 2),
-  ('Premium', 'premium', 'Featured placement plus priority lead matching.', 24900, 'month', '["business_profile", "unlimited_projects", "featured_placement", "priority_lead_matching"]'::jsonb, null, 3);
+  ('Basic', 'basic', 'Get discovered on YARDOLO and receive qualified opportunities when you''re a match.', 0, 'month',
+    '["business_profile", "qualified_opportunities", "contractor_dashboard", "opportunity_notifications", "standard_priority"]'::jsonb, 5, 1),
+  ('Featured', 'featured', 'Get priority marketplace visibility and increased exposure among qualified opportunities.', 29900, 'month',
+    '["priority_matching", "featured_placement", "enhanced_profile", "featured_badge", "increased_exposure"]'::jsonb, null, 2),
+  ('Premium', 'premium', 'Get the highest marketplace priority and maximum exposure among qualified opportunities.', 69900, 'month',
+    '["highest_priority", "maximum_exposure", "premium_badge", "priority_support"]'::jsonb, null, 3);

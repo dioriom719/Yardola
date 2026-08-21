@@ -7,6 +7,7 @@ import {
   listOwnedBusinesses,
 } from "@/lib/data/business-portal";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { formatPlanAdvantage } from "@/lib/format";
 
 export const metadata = buildMetadata({
   title: "Professional Dashboard | YARDOLO",
@@ -71,6 +72,12 @@ export default async function BusinessDashboardPage() {
                   >
                     {business.status}
                   </Badge>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <Badge variant="outline">{business.planName}</Badge>
+                  <span className="text-muted-foreground text-xs">
+                    {formatPlanAdvantage(business.planSlug)}
+                  </span>
                 </div>
                 <div className="mt-5 grid grid-cols-3 gap-3 text-center">
                   <div className="bg-secondary/40 rounded-lg p-3">

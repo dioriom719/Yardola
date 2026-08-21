@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getLeadEntitlement } from "@/lib/data/billing";
 
 export interface OwnedBusiness {
   id: string;
@@ -16,6 +17,8 @@ export interface OwnedBusiness {
   serviceCount: number;
   areaCount: number;
   leadCount: number;
+  planName: string;
+  planSlug: string;
 }
 
 export async function listOwnedBusinesses(): Promise<OwnedBusiness[]> {
@@ -39,7 +42,14 @@ export async function listOwnedBusinesses(): Promise<OwnedBusiness[]> {
 
   if (error) throw error;
 
-  return (data ?? []).map((business) => ({
+  const businesses = data ?? [];
+  // The business's current plan tier -- server-trusted, same source as
+  // the active-opportunity cap (getLeadEntitlement), never client state.
+  const entitlements = await Promise.all(
+    businesses.map((b) => getLeadEntitlement(supabase, b.id))
+  );
+
+  return businesses.map((business, i) => ({
     id: business.id,
     name: business.name,
     slug: business.slug,
@@ -55,6 +65,8 @@ export async function listOwnedBusinesses(): Promise<OwnedBusiness[]> {
     serviceCount: business.business_services?.[0]?.count ?? 0,
     areaCount: business.business_service_areas?.[0]?.count ?? 0,
     leadCount: business.lead_matches?.[0]?.count ?? 0,
+    planName: entitlements[i].planName,
+    planSlug: entitlements[i].planSlug,
   }));
 }
 

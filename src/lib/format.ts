@@ -136,6 +136,59 @@ export function formatMatchTier(score: number): string {
   return "Fair match";
 }
 
+/**
+ * Customer-facing text for each plan's `features` entries (Phase 15
+ * locked pricing). `plans.features` in the database is the single
+ * source of truth for which entitlements a tier has; this only supplies
+ * the display label for each key -- never expose the raw key itself.
+ */
+const PLAN_FEATURE_LABELS: Record<string, string> = {
+  business_profile: "YARDOLO business profile",
+  qualified_opportunities: "Qualified opportunities",
+  contractor_dashboard: "Contractor dashboard",
+  opportunity_notifications: "Opportunity notifications",
+  standard_priority: "Standard marketplace priority",
+  priority_matching: "Priority marketplace matching",
+  featured_placement: "Featured placement",
+  enhanced_profile: "Enhanced business profile",
+  featured_badge: "Featured badge",
+  increased_exposure: "Increased marketplace exposure",
+  highest_priority: "Highest marketplace priority",
+  maximum_exposure: "Maximum marketplace exposure",
+  premium_badge: "Premium badge",
+  priority_support: "Priority support",
+};
+
+/** Falls back to the raw key (title-cased) for a feature added to the database without a matching label here. */
+export function formatPlanFeature(key: string): string {
+  return (
+    PLAN_FEATURE_LABELS[key] ??
+    key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+  );
+}
+
+/** One-line marketplace advantage per plan, shown wherever a contractor needs to understand what their plan actually does for them. */
+const PLAN_ADVANTAGE_LABELS: Record<string, string> = {
+  basic: "Standard marketplace priority",
+  featured: "Priority marketplace visibility",
+  premium: "Highest marketplace priority",
+};
+
+export function formatPlanAdvantage(slug: string): string {
+  return PLAN_ADVANTAGE_LABELS[slug] ?? "Standard marketplace priority";
+}
+
+/** Short CTA-style tagline for the pricing page's plan cards. */
+const PLAN_TAGLINE_LABELS: Record<string, string> = {
+  basic: "Get Started",
+  featured: "Get More Exposure",
+  premium: "Maximum Exposure",
+};
+
+export function formatPlanTagline(slug: string): string {
+  return PLAN_TAGLINE_LABELS[slug] ?? "Get Started";
+}
+
 /** A plan without a homeowner-chosen name falls back to its first project type. */
 export function formatPlanTitle(
   title: string | null,
