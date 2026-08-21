@@ -1,6 +1,6 @@
 # YARDOLO Production Launch Checklist
 
-Last updated by Phase 15. This document is organized around one question
+Last updated by Phase 19. This document is organized around one question
 for every item: **who or what can act on this next?** Five categories:
 
 - **COMPLETED IN CODE** -- implemented and verified (see verification
@@ -21,6 +21,104 @@ for every item: **who or what can act on this next?** Five categories:
 locally."** Every COMPLETED IN CODE item below states its verification
 method. Everything else is genuinely blocked on something outside this
 repository.
+
+---
+
+## Phase 19 update: hosted preview deployment preparation
+
+Phase 19's goal was LOCAL -> VERCEL PREVIEW -> real Supabase/Stripe test
+environment -> hosted QA -> production-ready. As of this phase: **no
+Vercel, Supabase, or Stripe credentials or connectors are available in
+this sandbox** -- the same credential boundary documented since Phase 10.
+Nothing was deployed anywhere. This phase therefore prepared the
+repository so a Preview deployment works cleanly once you connect a real
+Vercel project, and documented the exact manual steps below instead of
+fabricating a deployment.
+
+Two real (not hypothetical) deployment blockers were found and fixed in
+code this phase:
+
+- [x] **`env.siteUrl` would throw on Vercel Preview deployments.**
+      `NEXT_PUBLIC_SITE_URL` is intentionally required in any
+      `NODE_ENV=production` build (see above) -- but Vercel builds _both_
+      Preview and Production deployments with `NODE_ENV=production`, and
+      Preview deployments each get a unique, dynamically-assigned URL, so
+      there is no single domain to hardcode into `NEXT_PUBLIC_SITE_URL`
+      for Preview. Fixed in `src/lib/env.ts`: `siteUrl` now falls back to
+      Vercel's auto-injected `NEXT_PUBLIC_VERCEL_URL` (that deployment's
+      own host) before failing. Leave `NEXT_PUBLIC_SITE_URL` **unset** on
+      the Preview environment in Vercel so this fallback engages; set it
+      explicitly to the real domain on Production once one exists.
+- [x] **No preview-vs-production indexability distinction existed.**
+      `robots.ts` unconditionally allowed crawling and every page's
+      `index` flag was honored as-is, which would let a temporary
+      `*.vercel.app` preview link get crawled and indexed by search
+      engines under YARDOLO's name before a real domain exists. Fixed
+      with one new flag, `SITE_IS_PUBLICLY_INDEXABLE`
+      (`src/lib/seo/config.ts`) -- `false` whenever `SITE_URL` contains
+      `.vercel.app`, `true` otherwise (including local dev and, once set,
+      a real production domain -- no further code change needed then).
+      Wired into three layers of defense: `src/app/robots.ts` returns a
+      blanket `disallow: "/"` instead of the normal ruleset;
+      `src/lib/seo/metadata.ts`'s `robotsFor()` forces every page's meta
+      `robots` tag to `noindex` regardless of what the caller asked for;
+      `src/app/sitemap.ts` returns empty sections rather than real
+      content URLs. All three self-correct automatically once
+      `NEXT_PUBLIC_SITE_URL` is set to a real (non-`vercel.app`) domain.
+
+No other code changes were required -- `package.json`, `next.config.ts`,
+`proxy.ts`/`src/lib/supabase/middleware.ts`, the auth server actions, the
+Stripe billing/webhook routes, and `.env.example` were all re-audited this
+phase and found already correct for Preview deployment (all redirect/
+canonical/checkout URLs already route through `env.siteUrl`, which now
+resolves correctly on Preview thanks to the fix above).
+
+### Exact steps to get a real Vercel Preview deployment
+
+1. In the Vercel dashboard, "Add New... -> Project", import
+   `dioriom719/Yardola` (or `dioriom719/Yardolo` -- same repository, see
+   below) from GitHub.
+2. Framework preset: Next.js (auto-detected). Build/output settings:
+   leave at Vercel's Next.js defaults -- nothing in this repo needs a
+   custom build command, output directory, or root directory.
+3. In Project Settings -> Git, confirm the Production Branch is whatever
+   you intend for eventual production (do **not** set it to `yardolo` if
+   you want Production to stay untouched during this preview phase) --
+   pushing to `yardolo` will still trigger a Preview deployment for that
+   branch regardless of which branch is set as Production.
+4. In Project Settings -> Environment Variables, add these for the
+   **Preview** environment only (uncheck Production/Development if the UI
+   defaults to all three):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `STRIPE_SECRET_KEY` (test mode)
+   - `STRIPE_WEBHOOK_SECRET` (test mode)
+   - Do **not** set `NEXT_PUBLIC_SITE_URL` for Preview -- leave it unset
+     so the `NEXT_PUBLIC_VERCEL_URL` fallback added this phase engages.
+5. In Project Settings -> Environment Variables (bottom of page), enable
+   "Automatically expose System Environment Variables" -- this is what
+   makes `NEXT_PUBLIC_VERCEL_URL` exist at build time; without it the
+   fallback in step 4 has nothing to read and the build will fail on the
+   missing-`NEXT_PUBLIC_SITE_URL` error by design (fail loud, not guess).
+6. Deploy the `yardolo` branch (push to it, or trigger manually from the
+   Vercel dashboard). Do not promote the result to Production and do not
+   attach a custom domain -- this is a Preview-only exercise per this
+   phase's explicit instructions.
+7. Once the four remaining sections below (Supabase, Auth, Stripe) are
+   also configured with real test-mode credentials, the Preview URL
+   Vercel gives you is what hosted QA (hosted browser testing, hosted
+   security verification, visual QA, performance) in a later phase will
+   run against. None of that testing was possible this phase since no
+   Preview deployment exists yet.
+
+**Production-safety confirmation:** this phase created no live Stripe
+Products/Prices/customers/billing objects (no Stripe credentials were
+available to create anything with, test or live), purchased no domain,
+made no DNS change, deployed nothing anywhere, and did not alter
+marketplace scoring, RLS policies, PII masking, or locked pricing. Every
+change this phase was either a documentation update or one of the two
+code fixes described above.
 
 ---
 
@@ -207,6 +305,13 @@ deploying with real credentials, manually verify at minimum:
 13. No console errors on the homepage, planner, business dashboard, or
     billing page in production.
 
+**Phase 19 status: none of the above 13 items have been verified against
+a real hosted deployment.** No Preview URL exists yet (see the Phase 19
+section above) -- this whole checklist, plus the phase's additional
+hosted-security and visual-QA checklists, remain blocked until you
+complete the Vercel + Supabase + Stripe setup steps in this document and
+share the resulting Preview URL.
+
 ---
 
 ## Manual Supabase setup steps (for whoever has project access)
@@ -235,7 +340,18 @@ deploying with real credentials, manually verify at minimum:
    URL and redirect URL allowlist to your real production domain. The
    `site_url`/`additional_redirect_urls` values in
    `supabase/config.toml` are local-CLI-only and have no effect on a
-   hosted project.
+   hosted project. **For a Vercel Preview deployment specifically**
+   (Phase 19), each deployment/push gets its own unique
+   `*.vercel.app` URL, so a single exact redirect URL won't cover every
+   preview build -- add a wildcard entry to the redirect allowlist, e.g.
+   `https://your-project-*.vercel.app/**` (adjust the prefix to match
+   your actual Vercel project's URL pattern), in addition to your
+   eventual real-domain entry. Every auth redirect in this codebase
+   (signup confirmation, login, logout, password reset, `/auth/confirm`)
+   already builds its URL from `env.siteUrl` / `absoluteUrl()`, which
+   Phase 19 taught to resolve to the correct per-deployment
+   `NEXT_PUBLIC_VERCEL_URL` automatically -- so the only remaining
+   Preview-specific action is this Supabase-side allowlist entry.
 7. Confirm the `homeowner-uploads` storage bucket is private (created
    with `public: false` by migration; verify this wasn't overridden in
    the dashboard).

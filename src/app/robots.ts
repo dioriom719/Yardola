@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import {
   SITE_URL,
+  SITE_IS_PUBLICLY_INDEXABLE,
   DISALLOWED_ROBOTS_PATHS,
   SITEMAP_SECTIONS,
 } from "@/lib/seo/config";
@@ -10,6 +11,13 @@ import {
 // no auto-generated `/sitemap.xml` index for that pattern, so every
 // section is listed explicitly here.
 export default function robots(): MetadataRoute.Robots {
+  // Placeholder vercel.app host, no real production domain yet (Phase
+  // 19) -- block crawling entirely rather than relying on per-page
+  // noindex alone, so a preview link never ends up discoverable.
+  if (!SITE_IS_PUBLICLY_INDEXABLE) {
+    return { rules: { userAgent: "*", disallow: "/" } };
+  }
+
   return {
     rules: {
       userAgent: "*",

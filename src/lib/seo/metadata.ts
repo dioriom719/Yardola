@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   DEFAULT_DESCRIPTION,
   DEFAULT_TITLE,
+  SITE_IS_PUBLICLY_INDEXABLE,
   SITE_NAME,
 } from "@/lib/seo/config";
 import { absoluteUrl } from "@/lib/seo/urls";
@@ -19,9 +20,15 @@ import type { GuideDetail } from "@/types/guide";
  */
 
 function robotsFor(index: boolean): Metadata["robots"] {
+  // On a placeholder vercel.app host (no real production domain yet),
+  // every page is noindex regardless of what the caller asked for -- see
+  // SITE_IS_PUBLICLY_INDEXABLE.
+  const shouldIndex = index && SITE_IS_PUBLICLY_INDEXABLE;
   // noindex pages still allow `follow` so link equity keeps flowing
   // through them to the pages that *should* rank.
-  return index ? { index: true, follow: true } : { index: false, follow: true };
+  return shouldIndex
+    ? { index: true, follow: true }
+    : { index: false, follow: true };
 }
 
 function truncate(text: string, max: number): string {

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/seo/urls";
-import { SITEMAP_SECTIONS } from "@/lib/seo/config";
+import { SITEMAP_SECTIONS, SITE_IS_PUBLICLY_INDEXABLE } from "@/lib/seo/config";
 import {
   listQualifyingCategories,
   listQualifyingLocations,
@@ -31,6 +31,14 @@ export default async function sitemap({
   id: Promise<string>;
 }): Promise<MetadataRoute.Sitemap> {
   const resolvedId = (await id) as SitemapId;
+
+  // Placeholder vercel.app host, no real production domain yet (Phase 19).
+  // robots.ts already stops advertising these URLs, but the route itself
+  // is still directly reachable -- return empty sections rather than real
+  // content URLs on a preview host, as a second layer of defense.
+  if (!SITE_IS_PUBLICLY_INDEXABLE) {
+    return [];
+  }
 
   switch (resolvedId) {
     case "core":

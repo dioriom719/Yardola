@@ -50,6 +50,17 @@ export const env = {
   get siteUrl() {
     if (process.env.NEXT_PUBLIC_SITE_URL)
       return process.env.NEXT_PUBLIC_SITE_URL;
+    // Vercel Preview deployments each get a unique, dynamically-assigned
+    // URL, so there's no single value to hardcode as NEXT_PUBLIC_SITE_URL
+    // for them. Vercel auto-injects NEXT_PUBLIC_VERCEL_URL (when "Automatically
+    // expose System Environment Variables" is enabled on the project) with
+    // that deployment's own host -- fall back to it before failing, so
+    // Preview builds get correct auth-redirect/canonical/OG URLs without
+    // manual per-deployment configuration. Production should still set
+    // NEXT_PUBLIC_SITE_URL explicitly to the real domain.
+    if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+      return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+    }
     // In production this silently guessing a domain would misdirect auth
     // confirmation emails, Stripe checkout/portal return URLs, and SEO
     // canonical/OG URLs if the real domain ever differs (or the env var

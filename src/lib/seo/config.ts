@@ -7,6 +7,18 @@ import { env } from "@/lib/env";
  */
 
 export const SITE_URL = env.siteUrl.replace(/\/+$/, "");
+
+/**
+ * False on every Vercel-assigned `*.vercel.app` host (preview deployments,
+ * and a "Production" Vercel environment before a real custom domain is
+ * attached) -- Phase 19: we don't have the final production domain yet, so
+ * nothing served from a placeholder vercel.app URL should ever be crawled
+ * or indexed. Once NEXT_PUBLIC_SITE_URL is set to the real domain, this
+ * flips back to true automatically -- no further code change needed then.
+ * Local dev keeps its existing behavior (this only matches vercel.app).
+ */
+export const SITE_IS_PUBLICLY_INDEXABLE = !SITE_URL.includes(".vercel.app");
+
 export const SITE_NAME = "YARDOLO";
 export const SITE_TAGLINE = "Your Backyard Starts Here.";
 export const DEFAULT_TITLE = `${SITE_NAME} | Backyard Projects & Inspiration in Las Vegas`;
