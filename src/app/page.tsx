@@ -16,11 +16,13 @@ export const metadata = generateHomeMetadata();
 /**
  * Homepage visual journey: Dream (Hero, big image) -> Explore
  * (CategoryExplorer, visual grid) -> Get inspired (InspirationGallery,
- * editorial gallery) -> Plan (BuilderSection, interactive) -> See the
- * finished result (RealProjects, project gallery) -> Find the right
- * professional (ProfessionalsSection) -> Start (FinalCta, big image).
- * Guides is intentionally not on the homepage (still reachable from
- * nav/footer at /guides) -- "fewer things, bigger things."
+ * editorial gallery) -> See the finished result (RealProjects, project
+ * gallery) -> Find the right professional (ProfessionalsSection) -> Plan
+ * (BuilderSection, interactive) -> Start (FinalCta, big image). Proof
+ * (real projects + real professionals) comes before the builder asks a
+ * homeowner to commit. Guides is intentionally not on the homepage
+ * (still reachable from nav/footer at /guides) -- "fewer things, bigger
+ * things."
  */
 export default async function Home() {
   const [categories, cities, zipCodes, featuredProjects, featuredBusinesses] =
@@ -37,13 +39,13 @@ export default async function Home() {
       <Hero />
       <CategoryExplorer categories={categories} />
       <InspirationGallery />
+      <RealProjects projects={featuredProjects} />
+      <ProfessionalsSection businesses={featuredBusinesses} />
       <BuilderSection
         categories={categories}
         cities={cities}
         zipCodes={zipCodes}
       />
-      <RealProjects projects={featuredProjects} />
-      <ProfessionalsSection businesses={featuredBusinesses} />
       <FinalCta />
     </>
   );

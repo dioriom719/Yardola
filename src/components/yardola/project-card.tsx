@@ -45,26 +45,22 @@ export function ProjectCard({
         </div>
       </div>
       <div className="pointer-events-none space-y-1.5 p-4">
-        <div className="flex items-center justify-between gap-2">
-          {project.categoryName && (
-            <span className="text-primary text-xs font-medium tracking-wide uppercase">
-              {project.categoryName}
-            </span>
-          )}
-          {budgetLabel && (
-            <span className="text-muted-foreground text-xs">{budgetLabel}</span>
-          )}
-        </div>
         <h3 className="font-display text-foreground line-clamp-1 text-lg">
           {project.title}
         </h3>
         <p className="text-muted-foreground text-sm">
-          {project.cityName}
-          {project.styleName ? ` · ${project.styleName}` : ""}
+          {[project.cityName, project.categoryName, project.styleName]
+            .filter(Boolean)
+            .join(" · ")}
         </p>
-        {project.businessName && (
+        {(budgetLabel || project.businessName) && (
           <p className="text-muted-foreground text-xs">
-            By {project.businessName}
+            {[
+              budgetLabel,
+              project.businessName ? `By ${project.businessName}` : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
         )}
       </div>

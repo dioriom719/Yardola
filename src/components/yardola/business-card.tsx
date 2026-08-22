@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BadgeCheck } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import type { BusinessCardData } from "@/types/business";
 
 interface BusinessCardProps {
@@ -76,13 +75,9 @@ export function BusinessCard({ business }: BusinessCardProps) {
             {business.projectCount === 1 ? "project" : "projects"} on YARDOLO
           </p>
           {business.categoryNames.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {business.categoryNames.slice(0, 3).map((category) => (
-                <Badge key={category} variant="secondary">
-                  {category}
-                </Badge>
-              ))}
-            </div>
+            <p className="text-muted-foreground mt-2 text-sm">
+              {business.categoryNames.slice(0, 3).join(" · ")}
+            </p>
           )}
         </div>
       </div>

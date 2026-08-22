@@ -4,6 +4,7 @@ import { YardoloLogo } from "@/components/yardola/logo";
 const EXPLORE_LINKS = [
   { href: "/projects", label: "Projects" },
   { href: "/professionals", label: "Professionals" },
+  { href: "/locations", label: "Locations" },
   { href: "/guides", label: "Guides" },
   { href: "/plan", label: "Plan My Project" },
 ] as const;

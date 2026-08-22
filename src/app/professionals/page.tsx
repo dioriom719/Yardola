@@ -7,7 +7,11 @@ import { SearchBar } from "@/components/yardola/search-bar";
 import { FilterBar } from "@/components/yardola/filter-bar";
 import { BusinessGrid } from "@/components/yardola/business-grid";
 import { Pagination } from "@/components/yardola/pagination";
-import { listCategories } from "@/lib/data/categories";
+import { CategoryCard } from "@/components/yardola/category-card";
+import {
+  listCategories,
+  listCategoriesWithSampleImage,
+} from "@/lib/data/categories";
 import { listCities } from "@/lib/data/locations";
 import { listBusinesses, type BusinessFilters } from "@/lib/data/businesses";
 import { paramInt, paramString } from "@/lib/search-params";
@@ -60,6 +64,9 @@ export default async function ProfessionalsPage(
     listCategories(),
     listCities(),
   ]);
+  const categoriesWithSample = await listCategoriesWithSampleImage(
+    categories.slice(0, 4)
+  );
 
   const hasActiveFilters = Object.values(filters).some(Boolean);
 
@@ -136,6 +143,23 @@ export default async function ProfessionalsPage(
           buildHref={buildHref}
         />
       </div>
+
+      {categoriesWithSample.length > 0 && (
+        <section className="border-border mt-16 border-t pt-12">
+          <h2 className="font-display text-foreground text-2xl">
+            Browse by category
+          </h2>
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {categoriesWithSample.map((category) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                href={`/professionals?category=${category.slug}`}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
