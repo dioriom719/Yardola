@@ -74,23 +74,31 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
   }).toString()}`;
 
   // Real data only, and only what's actually set -- never a fabricated
-  // budget, year, or property type filling an empty field.
+  // budget, year, or property type filling an empty field. The two
+  // otherwise-ambiguous tokens (style, year) carry a word of their own
+  // context so the line reads as a sentence rather than an unlabeled
+  // database row -- everything else (location, budget) is already
+  // self-evident on its own.
+  const projectYear = formatProjectYear(project.projectYear);
   const metaLine = [
     project.neighborhoodName
       ? `${project.neighborhoodName}, ${project.cityName}`
       : project.cityName,
     formatPropertyType(project.propertyType),
-    project.styles.map((s) => s.name).join(", ") || null,
+    project.styles.length > 0
+      ? `${project.styles.map((s) => s.name).join(", ")} style`
+      : null,
     formatBudgetRange(project.budgetRange),
-    formatProjectYear(project.projectYear),
+    projectYear ? `Completed ${projectYear}` : null,
   ].filter((v): v is string => Boolean(v));
 
   return (
     <div className="pb-16">
       <JsonLd data={buildProjectJsonLd(project)} />
 
-      <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 pt-4 sm:px-6 lg:px-8">
         <SeoBreadcrumbs
+          className="opacity-70"
           items={[
             { label: "Home", href: "/" },
             { label: "Projects", href: "/projects" },
@@ -123,7 +131,7 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
       {/* Hero / project photography -- the widest band on the page, the
           first thing a visitor sees, deliberately given more room than
           the text content below it. */}
-      <div className="mx-auto mt-5 max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto mt-3 max-w-6xl px-4 sm:px-6 lg:px-8">
         <ProjectGallery photos={project.photos} title={project.title} />
       </div>
 
@@ -175,11 +183,11 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
         </div>
 
         {businessDetail && (
-          <section className="mt-14">
+          <section className="border-border mt-16 border-t pt-12">
             <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               Built by
             </p>
-            <div className="mt-4 max-w-xs">
+            <div className="mt-5 max-w-xs sm:max-w-sm md:max-w-md">
               <ProfessionalShowcaseCard
                 business={toBusinessCardData(businessDetail)}
               />
