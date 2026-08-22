@@ -8,21 +8,19 @@ import { FinalCta } from "@/components/yardola/home/final-cta";
 import { listCategories } from "@/lib/data/categories";
 import { listCities, listZipCodes } from "@/lib/data/locations";
 import { listFeaturedProjects } from "@/lib/data/projects";
-import { listSavedProjectIds } from "@/lib/data/saved-projects";
 import { listFeaturedBusinesses } from "@/lib/data/businesses";
 import { generateHomeMetadata } from "@/lib/seo/metadata";
 
 export const metadata = generateHomeMetadata();
 
 /**
- * Homepage visual journey (Phase 1.6): Dream (Hero, big image) -> Explore
+ * Homepage visual journey: Dream (Hero, big image) -> Explore
  * (CategoryExplorer, visual grid) -> Get inspired (InspirationGallery,
- * big image moment) -> Plan (BuilderSection, interactive) -> See the
+ * editorial gallery) -> Plan (BuilderSection, interactive) -> See the
  * finished result (RealProjects, project gallery) -> Find the right
  * professional (ProfessionalsSection) -> Start (FinalCta, big image).
- * Guides dropped from the homepage entirely this phase (still reachable
- * from nav/footer at /guides) -- "fewer things, bigger things" meant
- * cutting a section, not just shrinking one.
+ * Guides is intentionally not on the homepage (still reachable from
+ * nav/footer at /guides) -- "fewer things, bigger things."
  */
 export default async function Home() {
   const [categories, cities, zipCodes, featuredProjects, featuredBusinesses] =
@@ -33,9 +31,6 @@ export default async function Home() {
       listFeaturedProjects(3),
       listFeaturedBusinesses(3),
     ]);
-  const savedProjectIds = await listSavedProjectIds(
-    featuredProjects.map((project) => project.id)
-  );
 
   return (
     <>
@@ -47,10 +42,7 @@ export default async function Home() {
         cities={cities}
         zipCodes={zipCodes}
       />
-      <RealProjects
-        projects={featuredProjects}
-        savedProjectIds={savedProjectIds}
-      />
+      <RealProjects projects={featuredProjects} />
       <ProfessionalsSection businesses={featuredBusinesses} />
       <FinalCta />
     </>

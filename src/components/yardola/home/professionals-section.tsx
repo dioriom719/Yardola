@@ -12,7 +12,7 @@ export function ProfessionalsSection({
 
   return (
     <section className="border-border border-t">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-16 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <h2 className="font-display text-foreground text-3xl sm:text-4xl lg:text-5xl">
             Find the right professional.

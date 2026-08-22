@@ -14,11 +14,10 @@ interface BuilderSectionProps {
  * rather than linking out to a separate page. `id="start-project"` is
  * the target for every "Start Your Project" CTA on the page.
  *
- * Phase 1.6: tightened further -- shorter heading, no supporting
- * paragraph (the builder itself explains what it needs, step by step),
- * a slightly warm (not cream) card background so the tool reads as a
- * distinct, premium "moment" against the otherwise white page rather
- * than a form floating in empty space.
+ * Phase 1.7: dropped the ivory section wash from Phase 1.6 -- the brief
+ * called for cutting cream/sand back further toward a cohesive white
+ * canvas, so the card's own border and shadow now do all the work of
+ * reading as a distinct "product moment," not a background color.
  */
 export function BuilderSection({
   categories,
@@ -26,11 +25,8 @@ export function BuilderSection({
   zipCodes,
 }: BuilderSectionProps) {
   return (
-    <section
-      id="start-project"
-      className="border-border bg-ivory scroll-mt-16 border-t border-b"
-    >
-      <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 md:py-16 lg:px-8">
+    <section id="start-project" className="border-border scroll-mt-16 border-t">
+      <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
         <h2 className="font-display text-foreground text-center text-3xl sm:text-4xl lg:text-5xl">
           Plan your project.
         </h2>
