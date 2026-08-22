@@ -25,18 +25,12 @@ import type { BudgetRange, ProjectTimeline } from "@/types";
 const TOTAL_STEPS = 6;
 
 const STEP_META: { title: string; description?: string }[] = [
+  { title: "What are you creating?" },
+  { title: "Where are you building?" },
+  { title: "What's your budget?" },
+  { title: "When are you starting?" },
   {
-    title: "What are you dreaming about building?",
-    description: "Choose everything that applies.",
-  },
-  {
-    title: "Where is the project?",
-    description: "We'll use this to find professionals who serve your area.",
-  },
-  { title: "What's your approximate budget?" },
-  { title: "When would you like to start?" },
-  {
-    title: "Anything else we should know?",
+    title: "What's your vision?",
     description: "Optional -- materials, inspiration, must-haves.",
   },
   { title: "Save your project & see your matches" },

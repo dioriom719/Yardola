@@ -19,16 +19,12 @@ export function FinalCta() {
         sizes="100vw"
         className="object-cover"
       />
-      <div aria-hidden="true" className="absolute inset-0 bg-black/55" />
-      <div className="relative mx-auto w-full max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
+      <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
+      <div className="relative mx-auto w-full max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
         <h2 className="font-display text-3xl text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.4)] sm:text-4xl lg:text-5xl">
           Your dream backyard starts here.
         </h2>
-        <p className="mt-5 text-lg text-white/90">
-          Tell us what you&apos;re imagining. We&apos;ll help you find the right
-          professionals to bring it to life.
-        </p>
-        <div className="mt-9">
+        <div className="mt-8">
           <Button
             size="lg"
             className="h-12 px-8 text-base shadow-lg"

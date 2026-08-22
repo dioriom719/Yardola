@@ -3,6 +3,13 @@ import { NextRequest } from "next/server";
 const ALLOWED_HOSTS = new Set([
   "commons.wikimedia.org",
   "upload.wikimedia.org",
+  // Dev/seed-data placeholder images (see supabase/seed.sql's
+  // project_photos rows) -- without this, every real ProjectCard/
+  // BusinessCard image on the current seed data 403s through this
+  // proxy, since it predates this allowlist. next.config.ts's
+  // remotePatterns already allows this host directly for the same
+  // reason.
+  "placehold.co",
 ]);
 
 export async function GET(request: NextRequest) {

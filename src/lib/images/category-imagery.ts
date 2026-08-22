@@ -47,17 +47,17 @@ export const CATEGORY_IMAGES: Record<string, CategoryImage> = {
   },
   "putting-greens": {
     src: "/images/categories/putting-greens.jpg",
-    alt: "Close-up of dense, manicured green turf",
+    alt: "A modern estate with a manicured lawn, spa, and pool",
   },
   "outdoor-living": {
     src: "/images/categories/outdoor-living.jpg",
-    alt: "A backyard fire pit surrounded by lounge chairs and flowers",
+    alt: "A modern home's evening outdoor lounge and dining area beside a pool",
   },
 };
 
 export const HERO_IMAGE: CategoryImage = {
-  src: "/images/hero/backyard-bright.jpg",
-  alt: "A bright, sunlit modern backyard with a covered patio, pool, and turf lawn",
+  src: "/images/hero/dream-backyard.jpg",
+  alt: "A complete backyard at dusk with a pool, spa, waterfall feature, covered lounge, fireplace, and desert mountain views",
 };
 
 /** Reuses the original (dusk) hero photo as a distinct, moodier closing image. */
@@ -79,23 +79,13 @@ export const INSPIRATION_IMAGES: (CategoryImage & { label: string })[] = [
     label: "Poolside Living",
   },
   {
-    src: "/images/categories/outdoor-kitchens.jpg",
-    alt: "A modern outdoor kitchen with a built-in grill beside a pool",
-    label: "Outdoor Kitchens",
-  },
-  {
-    src: "/images/categories/landscaping.jpg",
-    alt: "Desert landscaping with palms, cacti, and flowering bougainvillea",
-    label: "Landscape Design",
+    src: "/images/hero/backyard-bright.jpg",
+    alt: "A bright, sunlit modern backyard with a covered patio, pool, and turf lawn",
+    label: "Entertaining, Reimagined",
   },
   {
     src: "/images/inspiration/evening-lighting.jpg",
     alt: "String lights glowing over an evening patio",
     label: "Evening Ambiance",
-  },
-  {
-    src: "/images/categories/pools.jpg",
-    alt: "A backyard pool surrounded by palm trees and landscaping",
-    label: "Backyard Pools",
   },
 ];

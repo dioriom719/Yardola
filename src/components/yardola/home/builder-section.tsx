@@ -14,10 +14,11 @@ interface BuilderSectionProps {
  * rather than linking out to a separate page. `id="start-project"` is
  * the target for every "Start Your Project" CTA on the page.
  *
- * Phase 1.5: tightened from the original pass -- less surrounding
- * whitespace, a slightly warm (not cream) card background so the tool
- * itself reads as a distinct, premium "moment" against the otherwise
- * white page, rather than a form floating in empty space.
+ * Phase 1.6: tightened further -- shorter heading, no supporting
+ * paragraph (the builder itself explains what it needs, step by step),
+ * a slightly warm (not cream) card background so the tool reads as a
+ * distinct, premium "moment" against the otherwise white page rather
+ * than a form floating in empty space.
  */
 export function BuilderSection({
   categories,
@@ -29,18 +30,10 @@ export function BuilderSection({
       id="start-project"
       className="border-border bg-ivory scroll-mt-16 border-t border-b"
     >
-      <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
-        <div className="text-center">
-          <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase">
-            Plan
-          </p>
-          <h2 className="font-display text-foreground mt-3 text-3xl sm:text-4xl lg:text-5xl">
-            What are you planning?
-          </h2>
-          <p className="text-muted-foreground mx-auto mt-3 max-w-xl text-lg">
-            Answer a few quick questions -- no account required to get started.
-          </p>
-        </div>
+      <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 md:py-16 lg:px-8">
+        <h2 className="font-display text-foreground text-center text-3xl sm:text-4xl lg:text-5xl">
+          Plan your project.
+        </h2>
 
         <div className="border-border bg-card mt-8 overflow-hidden rounded-2xl border shadow-md">
           <HomepageBuilder
