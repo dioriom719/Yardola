@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { JsonLd } from "@/components/seo/json-ld";
 import { ProjectGallery } from "@/components/yardola/project-gallery";
@@ -74,16 +73,22 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
   }).toString()}`;
 
   // Real data only, and only what's actually set -- never a fabricated
-  // budget, year, or property type filling an empty field. The two
-  // otherwise-ambiguous tokens (style, year) carry a word of their own
-  // context so the line reads as a sentence rather than an unlabeled
-  // database row -- everything else (location, budget) is already
-  // self-evident on its own.
+  // budget, year, or property type filling an empty field.
+  //
+  // Split into two lines that do two different jobs, rather than one
+  // five-token line that gates the story: a short "dateline" (location +
+  // category) that orients the reader in one breath right under the
+  // title, and a quieter facts line (property type, budget, completed
+  // year) that closes the story out afterward instead of opening on it.
+  const location = project.neighborhoodName
+    ? `${project.neighborhoodName}, ${project.cityName}`
+    : project.cityName;
+  const dateline = [location, primaryCategory?.name ?? null]
+    .filter((v): v is string => Boolean(v))
+    .join(" · ");
+
   const projectYear = formatProjectYear(project.projectYear);
-  const metaLine = [
-    project.neighborhoodName
-      ? `${project.neighborhoodName}, ${project.cityName}`
-      : project.cityName,
+  const factsLine = [
     formatPropertyType(project.propertyType),
     project.styles.length > 0
       ? `${project.styles.map((s) => s.name).join(", ")} style`
@@ -135,22 +140,17 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
         <ProjectGallery photos={project.photos} title={project.title} />
       </div>
 
-      {/* Identity + story + features + "Built by" all share the same
-          narrower reading column so the page reads as one continuous
-          editorial piece rather than a photo followed by a data sheet. */}
+      {/* Identity + story + "Built by" all share the same narrower
+          reading column so the page reads as one continuous editorial
+          piece. Sequenced as desire (title) -> brief context (dateline)
+          -> story, with the fuller practical facts held back until after
+          the story instead of gating it. */}
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
           <div className="mt-8 flex flex-wrap items-start justify-between gap-4">
-            <div>
-              {primaryCategory && (
-                <span className="text-primary text-xs font-medium tracking-wide uppercase">
-                  {primaryCategory.name}
-                </span>
-              )}
-              <h1 className="font-display text-foreground mt-1 text-4xl sm:text-5xl">
-                {project.title}
-              </h1>
-            </div>
+            <h1 className="font-display text-foreground text-4xl sm:text-5xl">
+              {project.title}
+            </h1>
             <SaveProjectButton
               projectId={project.id}
               initialSaved={alreadySaved}
@@ -159,26 +159,31 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
             />
           </div>
 
-          {metaLine.length > 0 && (
-            <p className="text-muted-foreground mt-3 text-sm">
-              {metaLine.join(" · ")}
-            </p>
+          {dateline && (
+            <p className="text-muted-foreground mt-2 text-sm">{dateline}</p>
           )}
 
           {project.description && (
-            <p className="text-foreground/90 mt-6 text-base whitespace-pre-line">
+            <p className="font-display text-foreground mt-7 text-xl leading-relaxed whitespace-pre-line">
               {project.description}
             </p>
           )}
 
           {project.features.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {project.features.map((feature) => (
-                <Badge key={feature.slug} variant="secondary">
-                  {feature.name}
-                </Badge>
-              ))}
+            <div className="mt-8">
+              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                Features
+              </p>
+              <p className="text-foreground mt-2 text-sm">
+                {project.features.map((f) => f.name).join(", ")}
+              </p>
             </div>
+          )}
+
+          {factsLine.length > 0 && (
+            <p className="text-muted-foreground mt-8 text-xs">
+              {factsLine.join(" · ")}
+            </p>
           )}
         </div>
 
@@ -210,11 +215,11 @@ export async function ProjectDetailView({ project }: ProjectDetailViewProps) {
 
         <section className="border-border mt-16 border-t py-16 text-center">
           <h2 className="font-display text-foreground text-3xl sm:text-4xl">
-            Start a project like this.
+            Want a backyard like this?
           </h2>
           <p className="text-muted-foreground mx-auto mt-3 max-w-md text-sm">
-            Tell us what you&apos;re dreaming about and we&apos;ll connect you
-            with professionals who can bring it to life.
+            Tell us about your project and we&apos;ll connect you with
+            professionals who can bring your vision to life.
           </p>
           <Button
             size="lg"
