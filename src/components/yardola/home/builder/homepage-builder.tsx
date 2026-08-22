@@ -188,6 +188,12 @@ export function HomepageBuilder({
         >
           See My Matches
         </Button>
+        <Link
+          href={planId ? `/plan?planId=${planId}&step=3` : "/plan"}
+          className="text-primary focus-visible:ring-ring mt-4 text-sm font-medium underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        >
+          Add photos, style &amp; features to your project
+        </Link>
       </div>
     );
   }
