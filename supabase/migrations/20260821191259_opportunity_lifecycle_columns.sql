@@ -1,0 +1,1 @@
+alter table public.lead_matches add column if not exists viewed_at timestamptz, add column if not exists interested_at timestamptz, add column if not exists connected_at timestamptz, add column if not exists resolved_at timestamptz;

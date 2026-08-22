@@ -5,8 +5,6 @@ create table public.guides (
   title text not null,
   slug text not null unique,
   excerpt text,
-  -- Markdown body. A structured/block-based format can replace this
-  -- later without touching the rest of the schema.
   content text,
   featured_image_url text,
   author_id uuid references public.profiles (id) on delete set null,
@@ -27,8 +25,6 @@ create index guides_status_idx on public.guides (status);
 create index guides_published_at_idx on public.guides (published_at);
 create index guides_category_id_idx on public.guides (category_id);
 create index guides_author_id_idx on public.guides (author_id);
-
--- Row Level Security --------------------------------------------------
 
 alter table public.guides enable row level security;
 

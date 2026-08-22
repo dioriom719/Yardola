@@ -202,7 +202,7 @@ client JS bundle (verified: only `NEXT_PUBLIC_`-prefixed variables are).
 - `npm run db:reset` -- drop, recreate, apply all migrations, seed
 - `npm run db:migration:new <name>` -- scaffold a new migration
 - Never edit an already-applied migration; add a new one instead
-  (see `supabase/migrations/20260821010000_drop_dead_match_score_function.sql`
+  (see `supabase/migrations/20260821191428_security_hardening.sql`
   for an example production-safe cleanup migration).
 
 ### Stripe (local)
