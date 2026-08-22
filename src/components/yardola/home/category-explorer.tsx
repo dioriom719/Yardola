@@ -4,39 +4,35 @@ import { CATEGORY_IMAGES } from "@/lib/images/category-imagery";
 import type { Category } from "@/types/category";
 
 /**
- * Image-first category exploration -- each tile is a real curated photo
- * (see CATEGORY_IMAGES), never an icon-only card. Every third tile spans
- * two rows on desktop so the grid reads as an edited layout rather than a
- * uniform icon grid.
+ * Image-first category exploration -- a clean, symmetrical grid.
+ * Every tile shares the same aspect ratio and the same spacing;
+ * consistency here reads as "intentional marketplace interface" rather
+ * than an editorial collage (that treatment is reserved for the hero and
+ * the inspiration gallery instead -- see Phase 1.5 notes in that file).
  */
 export function CategoryExplorer({ categories }: { categories: Category[] }) {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-28 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20 lg:px-8">
       <div className="max-w-2xl">
         <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase">
           Explore
         </p>
         <h2 className="font-display text-foreground mt-3 text-3xl sm:text-4xl lg:text-5xl">
-          What are you dreaming up?
+          What are you dreaming about?
         </h2>
         <p className="text-muted-foreground mt-4 text-lg">
           Start with a category to see real backyard transformations.
         </p>
       </div>
 
-      <div className="mt-12 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-        {categories.map((category, index) => {
+      <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+        {categories.map((category) => {
           const image = CATEGORY_IMAGES[category.slug];
-          const tall = index % 5 === 0;
           return (
             <Link
               key={category.id}
               href={`/projects/${category.slug}`}
-              className={`group bg-muted focus-visible:ring-ring relative block overflow-hidden rounded-xl focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
-                tall
-                  ? "aspect-[3/4] md:row-span-2 md:aspect-auto"
-                  : "aspect-[3/4]"
-              }`}
+              className="group bg-muted focus-visible:ring-ring relative block aspect-[4/5] overflow-hidden rounded-xl focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               {image && (
                 <Image

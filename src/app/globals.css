@@ -80,7 +80,11 @@
   --ivory: #faf9f5;
   --charcoal: #202624;
 
-  --background: var(--ivory);
+  /* Phase 1.5: white is the primary canvas -- warmth now comes from
+     photography, typography, and the green/terracotta accents rather
+     than a cream page background. --ivory stays defined and available
+     (bg-ivory) for the rare section that wants a very subtle warm wash. */
+  --background: #ffffff;
   --foreground: var(--charcoal);
   --card: #ffffff;
   --card-foreground: var(--charcoal);

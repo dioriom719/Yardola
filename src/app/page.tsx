@@ -1,45 +1,45 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ProjectCard } from "@/components/yardola/project-card";
 import { BusinessCard } from "@/components/yardola/business-card";
 import { Hero } from "@/components/yardola/home/hero";
 import { BuilderSection } from "@/components/yardola/home/builder-section";
 import { CategoryExplorer } from "@/components/yardola/home/category-explorer";
-import { HowItWorks } from "@/components/yardola/home/how-it-works";
+import { InspirationGallery } from "@/components/yardola/home/inspiration-gallery";
 import { FinalCta } from "@/components/yardola/home/final-cta";
 import { listCategories } from "@/lib/data/categories";
 import { listCities, listZipCodes } from "@/lib/data/locations";
-import { listFeaturedProjects } from "@/lib/data/projects";
-import { listSavedProjectIds } from "@/lib/data/saved-projects";
 import { listFeaturedBusinesses } from "@/lib/data/businesses";
 import { listGuides } from "@/lib/data/guides";
 import { generateHomeMetadata } from "@/lib/seo/metadata";
 
 export const metadata = generateHomeMetadata();
 
+/**
+ * Homepage story (Phase 1.5): Dream (Hero) -> Explore (CategoryExplorer)
+ * -> See what's possible (InspirationGallery) -> Plan (BuilderSection) ->
+ * Connect (Professionals) -> Start (FinalCta), with Guides as bonus
+ * content before the close. The standalone "How it works" 3-step
+ * explainer from Phase 1 was folded out -- the page's own flow now
+ * demonstrates that same story directly, so a separate icon-card section
+ * repeating it was redundant with itself (see Phase 1.5 report).
+ */
 export default async function Home() {
-  const [
-    categories,
-    cities,
-    zipCodes,
-    featuredProjects,
-    featuredBusinesses,
-    guides,
-  ] = await Promise.all([
-    listCategories(),
-    listCities(),
-    listZipCodes(),
-    listFeaturedProjects(8),
-    listFeaturedBusinesses(4),
-    listGuides(3),
-  ]);
-  const savedProjectIds = await listSavedProjectIds(
-    featuredProjects.map((project) => project.id)
-  );
+  const [categories, cities, zipCodes, featuredBusinesses, guides] =
+    await Promise.all([
+      listCategories(),
+      listCities(),
+      listZipCodes(),
+      listFeaturedBusinesses(4),
+      listGuides(3),
+    ]);
 
   return (
     <>
       <Hero />
+
+      <CategoryExplorer categories={categories} />
+
+      <InspirationGallery />
 
       <BuilderSection
         categories={categories}
@@ -47,62 +47,20 @@ export default async function Home() {
         zipCodes={zipCodes}
       />
 
-      <CategoryExplorer categories={categories} />
-
-      {/* Real projects. Real inspiration. */}
-      {featuredProjects.length > 0 && (
-        <section className="border-border bg-secondary/20 border-t">
-          <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-28 lg:px-8">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div className="max-w-2xl">
-                <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase">
-                  Get inspired
-                </p>
-                <h2 className="font-display text-foreground mt-3 text-3xl sm:text-4xl lg:text-5xl">
-                  Real projects. Real inspiration.
-                </h2>
-                <p className="text-muted-foreground mt-4 text-lg">
-                  See what&apos;s possible in backyards YARDOLO professionals
-                  have brought to life.
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                nativeButton={false}
-                render={<Link href="/projects" />}
-              >
-                Browse all projects
-              </Button>
-            </div>
-            <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {featuredProjects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  initialSaved={savedProjectIds.has(project.id)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      <HowItWorks />
-
       {/* Meet the people behind the projects */}
       {featuredBusinesses.length > 0 && (
-        <section className="border-border bg-secondary/20 border-t">
-          <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-28 lg:px-8">
+        <section className="border-border border-t">
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20 lg:px-8">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="max-w-2xl">
                 <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase">
-                  Professionals
+                  Connect
                 </p>
                 <h2 className="font-display text-foreground mt-3 text-3xl sm:text-4xl lg:text-5xl">
                   Meet the people behind the projects.
                 </h2>
                 <p className="text-muted-foreground mt-4 text-lg">
-                  Las Vegas professionals building the backyards on YARDOLO.
+                  Professionals ready to bring your project to life.
                 </p>
               </div>
               <Button
@@ -113,7 +71,7 @@ export default async function Home() {
                 Browse all professionals
               </Button>
             </div>
-            <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {featuredBusinesses.map((business) => (
                 <BusinessCard key={business.id} business={business} />
               ))}
@@ -124,7 +82,7 @@ export default async function Home() {
 
       {/* YARDOLO Guide */}
       {guides.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-28 lg:px-8">
+        <section className="border-border mx-auto max-w-7xl border-t px-4 py-16 sm:px-6 md:py-20 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
               <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase">
@@ -134,7 +92,7 @@ export default async function Home() {
                 YARDOLO Guide
               </h2>
               <p className="text-muted-foreground mt-4 text-lg">
-                Ideas and advice for planning a backyard project in Las Vegas.
+                Ideas and advice for planning your next backyard project.
               </p>
             </div>
             <Button
@@ -145,7 +103,7 @@ export default async function Home() {
               All guides
             </Button>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
             {guides.map((guide) => (
               <Link
                 key={guide.id}

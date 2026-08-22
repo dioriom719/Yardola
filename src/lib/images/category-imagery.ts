@@ -43,7 +43,7 @@ export const CATEGORY_IMAGES: Record<string, CategoryImage> = {
   },
   pergolas: {
     src: "/images/categories/pergolas.jpg",
-    alt: "A modern wooden pergola against a clear evening sky",
+    alt: "A backyard pool with a wooden pergola at sunset",
   },
   "putting-greens": {
     src: "/images/categories/putting-greens.jpg",
@@ -56,6 +56,46 @@ export const CATEGORY_IMAGES: Record<string, CategoryImage> = {
 };
 
 export const HERO_IMAGE: CategoryImage = {
+  src: "/images/hero/backyard-bright.jpg",
+  alt: "A bright, sunlit modern backyard with a covered patio, pool, and turf lawn",
+};
+
+/** Reuses the original (dusk) hero photo as a distinct, moodier closing image. */
+export const FINAL_CTA_IMAGE: CategoryImage = {
   src: "/images/hero/pool-golden-hour.jpg",
   alt: "A modern desert home with a lap pool at golden hour",
 };
+
+/**
+ * Curated "inspiration" imagery for the homepage's completed-projects
+ * section -- explicitly NOT tied to real project/business records (see
+ * InspirationGallery). Distinct from CATEGORY_IMAGES so the two sections
+ * never show identical photos.
+ */
+export const INSPIRATION_IMAGES: (CategoryImage & { label: string })[] = [
+  {
+    src: "/images/inspiration/poolside-lounge.jpg",
+    alt: "An aerial view of a pool deck with lounge chairs, umbrellas, and flowers",
+    label: "Poolside Living",
+  },
+  {
+    src: "/images/categories/outdoor-kitchens.jpg",
+    alt: "A modern outdoor kitchen with a built-in grill beside a pool",
+    label: "Outdoor Kitchens",
+  },
+  {
+    src: "/images/categories/landscaping.jpg",
+    alt: "Desert landscaping with palms, cacti, and flowering bougainvillea",
+    label: "Landscape Design",
+  },
+  {
+    src: "/images/inspiration/evening-lighting.jpg",
+    alt: "String lights glowing over an evening patio",
+    label: "Evening Ambiance",
+  },
+  {
+    src: "/images/categories/pools.jpg",
+    alt: "A backyard pool surrounded by palm trees and landscaping",
+    label: "Backyard Pools",
+  },
+];

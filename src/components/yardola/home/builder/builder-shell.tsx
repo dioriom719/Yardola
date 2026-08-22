@@ -38,7 +38,7 @@ export function BuilderShell({
   hideFooter = false,
 }: BuilderShellProps) {
   return (
-    <div className="flex min-h-[26rem] flex-col p-6 sm:p-10">
+    <div className="flex min-h-[24rem] flex-col p-5 sm:p-8">
       <div>
         <div className="bg-muted h-1 overflow-hidden rounded-full">
           <div
@@ -46,30 +46,30 @@ export function BuilderShell({
             style={{ width: `${(step / totalSteps) * 100}%` }}
           />
         </div>
-        <p className="text-muted-foreground mt-2.5 text-xs font-medium">
+        <p className="text-muted-foreground mt-2 text-xs font-medium">
           Step {step} of {totalSteps}
         </p>
       </div>
 
-      <div className="mt-5">
-        <h3 className="font-display text-foreground text-2xl sm:text-3xl">
+      <div className="mt-4">
+        <h3 className="font-display text-foreground text-xl sm:text-2xl">
           {title}
         </h3>
         {description && (
-          <p className="text-muted-foreground mt-2 text-sm">{description}</p>
+          <p className="text-muted-foreground mt-1.5 text-sm">{description}</p>
         )}
       </div>
 
-      <div className="mt-7 flex-1">{children}</div>
+      <div className="mt-5 flex-1">{children}</div>
 
       {error && (
-        <p role="alert" className="text-destructive mt-4 text-sm">
+        <p role="alert" className="text-destructive mt-3 text-sm">
           {error}
         </p>
       )}
 
       {!hideFooter && (
-        <div className="mt-8 flex gap-3">
+        <div className="mt-6 flex gap-3">
           {onBack ? (
             <Button
               type="button"
