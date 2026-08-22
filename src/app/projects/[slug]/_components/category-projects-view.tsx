@@ -200,6 +200,27 @@ export async function CategoryProjectsView({
           </ul>
         </section>
       )}
+
+      {/* CLOSING CTA -- matching is algorithmic (match_lead), so copy
+          never implies picking a specific professional directly from
+          this page. */}
+      <section className="border-border mt-16 border-t py-16 text-center">
+        <h2 className="font-display text-foreground text-3xl sm:text-4xl">
+          Ready to start your {category.name.toLowerCase()} project?
+        </h2>
+        <p className="text-muted-foreground mx-auto mt-3 max-w-md text-sm">
+          Tell us what you&apos;re planning and we&apos;ll match you with
+          qualified professionals in your area.
+        </p>
+        <Button
+          size="lg"
+          className="mt-6 h-12 px-8 text-base"
+          nativeButton={false}
+          render={<Link href={`/?category=${category.slug}#start-project`} />}
+        >
+          Start Your Project
+        </Button>
+      </section>
     </div>
   );
 }

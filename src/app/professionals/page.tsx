@@ -96,16 +96,21 @@ export default async function ProfessionalsPage(
         </p>
       </div>
 
-      <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="lg:max-w-xs lg:flex-1">
-          <SearchBar placeholder="Search professionals..." />
+      <div className="border-border bg-card mt-8 rounded-2xl border p-5 shadow-sm sm:p-6">
+        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          Find what you&apos;re looking for
+        </p>
+        <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="lg:max-w-none lg:flex-1">
+            <SearchBar placeholder="Search professionals..." size="lg" />
+          </div>
+          <FilterBar
+            categories={categories}
+            cities={cities}
+            hideStyle
+            hideBudget
+          />
         </div>
-        <FilterBar
-          categories={categories}
-          cities={cities}
-          hideStyle
-          hideBudget
-        />
       </div>
 
       <p className="text-muted-foreground mt-6 text-sm">

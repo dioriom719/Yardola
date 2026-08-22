@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HERO_IMAGE } from "@/lib/images/category-imagery";
+import type { Category } from "@/types/category";
 
 /**
  * Full-bleed, magazine-cover opening statement. Phase 1.6: the photo
@@ -10,8 +11,14 @@ import { HERO_IMAGE } from "@/lib/images/category-imagery";
  * upper third gives the headline somewhere to sit without darkening the
  * parts of the image people actually came to see. Copy trimmed to just
  * the headline and two CTAs -- nothing explains what's already visible.
+ *
+ * The category chips are the one functional addition: each deep-links
+ * into the homepage's own no-login builder with that category
+ * pre-selected (`/?category=<slug>#start-project`), giving the hero a
+ * real "tell us what you need" entry point instead of only generic
+ * buttons.
  */
-export function Hero() {
+export function Hero({ categories }: { categories: Category[] }) {
   return (
     <section className="relative flex min-h-[85svh] items-end overflow-hidden sm:min-h-[92svh]">
       <Image
@@ -52,6 +59,20 @@ export function Hero() {
             Explore Projects
           </Button>
         </div>
+
+        {categories.length > 0 && (
+          <div className="animate-in fade-in slide-in-from-bottom-3 mt-6 flex flex-wrap gap-2 duration-700">
+            {categories.slice(0, 5).map((category) => (
+              <Link
+                key={category.id}
+                href={`/?category=${category.slug}#start-project`}
+                className="focus-visible:ring-ring rounded-full border border-white/40 bg-white/10 px-4 py-1.5 text-sm text-white backdrop-blur-sm transition-colors hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -3,9 +3,11 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface SearchBarProps {
   placeholder?: string;
+  size?: "default" | "lg";
 }
 
 /**
@@ -14,6 +16,7 @@ interface SearchBarProps {
  */
 export function SearchBar({
   placeholder = "Search projects, pros, cities...",
+  size = "default",
 }: SearchBarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -37,7 +40,10 @@ export function SearchBar({
   return (
     <form onSubmit={handleSubmit} role="search" className="relative">
       <Search
-        className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+        className={cn(
+          "text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2",
+          size === "lg" ? "size-5" : "size-4"
+        )}
         aria-hidden="true"
       />
       <Input
@@ -47,7 +53,7 @@ export function SearchBar({
         defaultValue={searchParams.get("q") ?? ""}
         placeholder={placeholder}
         aria-label="Search"
-        className="pl-9"
+        className={cn(size === "lg" ? "h-12 pl-11 text-base" : "pl-9")}
       />
     </form>
   );

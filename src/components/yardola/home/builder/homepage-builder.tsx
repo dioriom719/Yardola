@@ -40,6 +40,7 @@ interface HomepageBuilderProps {
   categories: Category[];
   cities: City[];
   zipCodes: ZipCode[];
+  initialCategoryId?: string;
 }
 
 type Status = "idle" | "confirm-email" | "ready";
@@ -56,10 +57,13 @@ export function HomepageBuilder({
   categories,
   cities,
   zipCodes,
+  initialCategoryId,
 }: HomepageBuilderProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
-  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [categoryIds, setCategoryIds] = useState<string[]>(
+    initialCategoryId ? [initialCategoryId] : []
+  );
   const [cityId, setCityId] = useState<string | null>(null);
   const [zipCodeId, setZipCodeId] = useState<string | null>(null);
   const [budgetRange, setBudgetRange] = useState<BudgetRange | null>(null);

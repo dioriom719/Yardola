@@ -7,6 +7,7 @@ interface BuilderSectionProps {
   categories: Category[];
   cities: City[];
   zipCodes: ZipCode[];
+  initialCategoryId?: string;
 }
 
 /**
@@ -23,6 +24,7 @@ export function BuilderSection({
   categories,
   cities,
   zipCodes,
+  initialCategoryId,
 }: BuilderSectionProps) {
   return (
     <section id="start-project" className="border-border scroll-mt-16 border-t">
@@ -36,6 +38,7 @@ export function BuilderSection({
             categories={categories}
             cities={cities}
             zipCodes={zipCodes}
+            initialCategoryId={initialCategoryId}
           />
         </div>
       </div>

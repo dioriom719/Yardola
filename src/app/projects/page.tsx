@@ -5,8 +5,12 @@ import { SearchBar } from "@/components/yardola/search-bar";
 import { FilterBar } from "@/components/yardola/filter-bar";
 import { ProjectGrid } from "@/components/yardola/project-grid";
 import { Pagination } from "@/components/yardola/pagination";
+import { CategoryCard } from "@/components/yardola/category-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { listCategories } from "@/lib/data/categories";
+import {
+  listCategories,
+  listCategoriesWithSampleImage,
+} from "@/lib/data/categories";
 import { listCities } from "@/lib/data/locations";
 import { listStyles } from "@/lib/data/styles";
 import { listProjects, type ProjectFilters } from "@/lib/data/projects";
@@ -87,6 +91,9 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
   const savedProjectIds = await listSavedProjectIds(
     result.items.map((project) => project.id)
   );
+  const categoriesWithSample = await listCategoriesWithSampleImage(
+    categories.slice(0, 4)
+  );
 
   const hasActiveFilters = Object.values(filters).some(Boolean);
 
@@ -117,11 +124,16 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
         </p>
       </div>
 
-      <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="lg:max-w-xs lg:flex-1">
-          <SearchBar placeholder="Search projects or pros..." />
+      <div className="border-border bg-card mt-8 rounded-2xl border p-5 shadow-sm sm:p-6">
+        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          Find what you&apos;re looking for
+        </p>
+        <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="lg:max-w-none lg:flex-1">
+            <SearchBar placeholder="Search projects or pros..." size="lg" />
+          </div>
+          <FilterBar categories={categories} cities={cities} styles={styles} />
         </div>
-        <FilterBar categories={categories} cities={cities} styles={styles} />
       </div>
 
       <p className="text-muted-foreground mt-6 text-sm">
@@ -160,6 +172,19 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
           buildHref={buildHref}
         />
       </div>
+
+      {categoriesWithSample.length > 0 && (
+        <section className="border-border mt-16 border-t pt-12">
+          <h2 className="font-display text-foreground text-2xl">
+            Browse by category
+          </h2>
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {categoriesWithSample.map((category) => (
+              <CategoryCard key={category.id} category={category} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
